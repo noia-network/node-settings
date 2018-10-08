@@ -44,6 +44,10 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
         return this.scopes[key];
     }
 
+    public getScopes(): ScopedSettings<TSettings> {
+        return this.scopes;
+    }
+
     public getAll(): TSettings {
         const currentSettings: { [key: string]: unknown } = this.settings as {};
 
