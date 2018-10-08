@@ -1,7 +1,18 @@
 export type Primitive = string | number | boolean | null | undefined;
 
-export type OnlyPrimitiveKeys<T> = { [K in keyof T]: T[K] extends Primitive ? K : never }[keyof T];
-export type OnlyPrimitivesProperties<T> = Pick<T, OnlyPrimitiveKeys<T>>;
-export type ExceptPrimitiveKeys<T> = { [K in keyof T]: T[K] extends Primitive ? never : K }[keyof T];
-export type ExceptPrimitivesProperties<T> = Pick<T, ExceptPrimitiveKeys<T>>;
-export type DeepPartial<T> = {[K in keyof T]?: Partial<T[K]>}
+export type KeysExtend<T, TExtends> = { [K in keyof T]: T[K] extends TExtends ? K : never }[keyof T];
+export type PropertiesExtend<T, TExtends> = Pick<T, KeysExtend<T, TExtends>>;
+
+export type PrimitiveKeys<T> = KeysExtend<T, Primitive>;
+export type PrimitiveProperties<T> = PropertiesExtend<T, Primitive>;
+
+export type ExcludeKeysExtend<T, TExtends> = { [K in keyof T]: T[K] extends TExtends ? never : K }[keyof T];
+export type ExcludePropertiesExtend<T, TExtends> = Pick<T, ExcludeKeysExtend<T, TExtends>>;
+
+export type ExcludePrimitiveKeys<T> = ExcludeKeysExtend<T, Primitive>;
+export type ExcludePrimitiveProperties<T> = ExcludePropertiesExtend<T, Primitive>;
+
+export type PrimitiveAndPrimitiveArrayKeys<T> = KeysExtend<T, Primitive | Primitive[]>;
+export type PrimitiveAndPrimitiveArrayProperties<T> = PropertiesExtend<T, Primitive | Primitive[]>;
+
+export type DeepPartial<T> = { [K in keyof T]?: Partial<T[K]> };
