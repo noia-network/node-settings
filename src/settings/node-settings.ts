@@ -1,3 +1,5 @@
+import * as fs from "fs-extra";
+
 import { SettingsScopeBase, DefaultSettings, ScopedSettings } from "../abstractions/settings-scope-base";
 
 import { Helpers } from "../helpers";
@@ -59,6 +61,11 @@ export interface NodeSettingsDto {
 }
 
 export class NodeSettings extends SettingsScopeBase<NodeSettingsDto> {
+    public static async init(filePath: string): Promise<NodeSettings> {
+        const data = await fs.readJson(filePath);
+        return new NodeSettings(data);
+    }
+
     protected getDefaultSettings(): DefaultSettings<NodeSettingsDto> {
         return {
             statisticsPath: "",
