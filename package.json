@@ -1,18 +1,45 @@
 {
-  "name": "@noia-network/node-settings",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "build": "tsc -p .",
-    "watch": "tsc -p . -w"
-  },
-  "author": "",
-  "devDependencies": {
-    "typescript": "^3.1.1"
-  },
-  "dependencies": {
-    "@types/node": "^8.10.27",
-    "strict-event-emitter-types": "^2.0.0"
-  }
+    "name": "@noia-network/node-settings",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "build": "tsc -p .",
+        "watch": "tsc -p . -w"
+    },
+    "author": "",
+    "devDependencies": {
+        "jest": "^23.6.0",
+        "ts-jest": "^23.10.4",
+        "typescript": "^3.1.1"
+    },
+    "dependencies": {
+        "@types/jest": "^23.3.3",
+        "@types/node": "^8.10.27",
+        "strict-event-emitter-types": "^2.0.0"
+    },
+    "jest": {
+        "collectCoverage": true,
+        "transform": {
+            ".(ts|tsx)": "ts-jest"
+        },
+        "globals": {
+            "ts-jest": {
+                "babelConfig": false
+            }
+        },
+        "testRegex": "__tests__/.*\\.(test|spec).(ts|tsx|js)$",
+        "moduleNameMapper": {
+            "@src/(.*)": "<rootDir>/src/$1"
+        },
+        "coveragePathIgnorePatterns": [
+            "/node_modules/",
+            "/tests/"
+        ],
+        "moduleFileExtensions": [
+            "ts",
+            "tsx",
+            "js"
+        ]
+    }
 }

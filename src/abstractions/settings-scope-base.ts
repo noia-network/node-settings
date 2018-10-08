@@ -1,6 +1,13 @@
 import StrictEventEmitter from "strict-event-emitter-types";
 import { EventEmitter } from "events";
-import { Primitive, OnlyPrimitiveKeys, ExceptPrimitivesProperties, OnlyPrimitivesProperties } from "../contracts/types-helpers";
+import {
+    Primitive,
+    OnlyPrimitiveKeys,
+    ExceptPrimitivesProperties,
+    OnlyPrimitivesProperties,
+    DeepPartial,
+    ExceptPrimitiveKeys
+} from "../contracts/types-helpers";
 
 export interface SettingsScopeEvents {
     updated: (key: string[], value: Primitive) => void;
@@ -15,15 +22,36 @@ export type DefaultSettings<TSettings> = OnlyPrimitivesProperties<TSettings>;
 const SettingsScopeEmitter: { new (): StrictEventEmitter<EventEmitter, SettingsScopeEvents> } = EventEmitter;
 
 export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter {
-    constructor(settings: TSettings) {
+    constructor(settings: DeepPartial<TSettings>) {
         super();
-        this.settings = settings;
+
+        this.settings = {
+            ...(this.getDefaultSettings() as {}),
+            ...(settings as {})
+        } as TSettings;
+
+        this.scopes = this.initScopedSettings();
     }
 
     protected readonly settings: TSettings;
+    protected readonly scopes: ScopedSettings<TSettings>;
 
     public get<TKey extends OnlyPrimitiveKeys<TSettings>>(key: TKey): TSettings[TKey] {
         return this.settings[key];
+    }
+
+    public getScope<TKey extends ExceptPrimitiveKeys<TSettings>>(key: TKey): SettingsScopeBase<TSettings[TKey]> {
+        return this.scopes[key];
+    }
+
+    public getAll(): TSettings {
+        const currentSettings: { [key: string]: unknown } = this.settings as {};
+
+        for (const scopeKey of Object.keys(this.scopes)) {
+            currentSettings[scopeKey] = this.scopes[scopeKey].getAll();
+        }
+
+        return currentSettings as TSettings;
     }
 
     public update<TKey extends OnlyPrimitiveKeys<TSettings>>(key: TKey, value: TSettings[TKey]): void {

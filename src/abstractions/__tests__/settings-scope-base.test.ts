@@ -74,9 +74,9 @@ class WebSocketSettings extends SettingsScopeBase<NodeSettingsSocketsWebSocket> 
     }
 }
 
-const settings = new Settings({
+const SETTINGS_EXAMPLE = {
     version: "1.0.0",
-    statisticsPath: "~/.configstore/noia-node-statistics.json",
+    // statisticsPath: "~/.configstore/noia-node-statistics.json",
     sockets: {
         webrtc: {
             isEnabled: false,
@@ -87,7 +87,10 @@ const settings = new Settings({
             port: 0
         }
     }
-});
+};
 
-// Print version.
-console.info(settings.get("version"));
+it("First test", () => {
+    const settings = new Settings(SETTINGS_EXAMPLE);
+
+    expect(settings.get("version")).toBe(SETTINGS_EXAMPLE.version);
+});

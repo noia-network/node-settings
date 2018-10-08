@@ -8,14 +8,13 @@
         "noUnusedLocals": true,
         "inlineSourceMap": true,
         "inlineSources": true,
-        "skipDefaultLibCheck": true,
         "declaration": true,
         "strict": true,
         "moduleResolution": "node",
         "forceConsistentCasingInFileNames": true,
         "experimentalDecorators": true,
         "lib": ["es6", "es2017.object"],
-        "types": ["node"],
+        "types": ["node", "jest"],
         "plugins": [
             {
                 "name": "tslint-language-service",
