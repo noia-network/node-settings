@@ -2,22 +2,24 @@ import StrictEventEmitter from "strict-event-emitter-types";
 import { EventEmitter } from "events";
 import {
     Primitive,
-    OnlyPrimitiveKeys,
-    ExceptPrimitivesProperties,
-    OnlyPrimitivesProperties,
     DeepPartial,
-    ExceptPrimitiveKeys
+    ExcludePrimitiveAndPrimitiveArrayProperties,
+    PrimitiveAndPrimitiveArrayKeys,
+    ExcludePrimitiveAndPrimitiveArrayKeys,
+    PrimitiveAndPrimitiveArrayProperties
 } from "../contracts/types-helpers";
 
 export interface SettingsScopeEvents {
-    updated: (key: string[], value: Primitive) => void;
+    updated: (key: string[], value: Primitive | Primitive[]) => void;
     error: Error;
 }
 
 export type ScopedSettings<TValue> = {
-    [T in keyof ExceptPrimitivesProperties<TValue>]: SettingsScopeBase<ExceptPrimitivesProperties<TValue>[T]>
+    [T in keyof ExcludePrimitiveAndPrimitiveArrayProperties<TValue>]: SettingsScopeBase<
+        ExcludePrimitiveAndPrimitiveArrayProperties<TValue>[T]
+    >
 };
-export type DefaultSettings<TSettings> = OnlyPrimitivesProperties<TSettings>;
+export type DefaultSettings<TSettings> = PrimitiveAndPrimitiveArrayProperties<TSettings>;
 
 const SettingsScopeEmitter: { new (): StrictEventEmitter<EventEmitter, SettingsScopeEvents> } = EventEmitter;
 
@@ -36,11 +38,11 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
     protected readonly settings: TSettings;
     protected readonly scopes: ScopedSettings<TSettings>;
 
-    public get<TKey extends OnlyPrimitiveKeys<TSettings>>(key: TKey): TSettings[TKey] {
+    public get<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey): TSettings[TKey] {
         return this.settings[key];
     }
 
-    public getScope<TKey extends ExceptPrimitiveKeys<TSettings>>(key: TKey): SettingsScopeBase<TSettings[TKey]> {
+    public getScope<TKey extends ExcludePrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey): SettingsScopeBase<TSettings[TKey]> {
         return this.scopes[key];
     }
 
@@ -58,7 +60,7 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
         return currentSettings as TSettings;
     }
 
-    public update<TKey extends OnlyPrimitiveKeys<TSettings>>(key: TKey, value: TSettings[TKey]): void {
+    public update<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey, value: TSettings[TKey]): void {
         this.settings[key] = value;
         this.emit("updated", [key as string], (value as any) as Primitive);
     }

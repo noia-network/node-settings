@@ -15,4 +15,7 @@ export type ExcludePrimitiveProperties<T> = ExcludePropertiesExtend<T, Primitive
 export type PrimitiveAndPrimitiveArrayKeys<T> = KeysExtend<T, Primitive | Primitive[]>;
 export type PrimitiveAndPrimitiveArrayProperties<T> = PropertiesExtend<T, Primitive | Primitive[]>;
 
+export type ExcludePrimitiveAndPrimitiveArrayKeys<T> = ExcludeKeysExtend<T, Primitive | Primitive[]>;
+export type ExcludePrimitiveAndPrimitiveArrayProperties<T> = ExcludePropertiesExtend<T, Primitive | Primitive[]>;
+
 export type DeepPartial<T> = { [K in keyof T]?: Partial<T[K]> };
