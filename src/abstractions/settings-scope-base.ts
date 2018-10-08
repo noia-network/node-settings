@@ -33,6 +33,16 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
         } as TSettings;
 
         this.scopes = this.initScopedSettings();
+        // Re-emit to higher levels.
+        for (const scopeKey of Object.keys(this.scopes)) {
+            this.scopes[scopeKey].on("updated", (keys, value) => {
+                this.emit("updated", [scopeKey, ...keys], value);
+            });
+
+            this.scopes[scopeKey].on("error", error => {
+                this.emit("error", error);
+            });
+        }
     }
 
     protected readonly settings: TSettings;
