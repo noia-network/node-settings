@@ -1,7 +1,10 @@
 import * as fs from "fs-extra";
+import * as ini from "ini";
+import * as os from "os";
 
 import { SettingsScopeBase, DefaultSettings, ScopedSettings } from "../abstractions/settings-scope-base";
 
+import { DeepPartial } from "../contracts/types-helpers";
 import { Helpers } from "../helpers";
 
 // Scopes
@@ -9,6 +12,7 @@ import { ControllerSettings, ControllerSettingsDto } from "./controller-settings
 import { WalletSettings, WalletSettingsDto } from "./wallet-settings";
 import { StorageSettings, StorageSettingsDto } from "./storage-settings";
 import { WhitelistSettings, WhitelistSettingsDto } from "./whitelist-settings";
+import { SocketsSettings, SocketsSettingsDto } from "./sockets-settings";
 
 export interface NodeSettingsDto {
     statisticsPath: string;
@@ -58,12 +62,24 @@ export interface NodeSettingsDto {
     wallet: WalletSettingsDto;
     storage: StorageSettingsDto;
     whitelist: WhitelistSettingsDto;
+    sockets: SocketsSettingsDto;
 }
 
 export class NodeSettings extends SettingsScopeBase<NodeSettingsDto> {
+    constructor(public readonly filePath: string, settings: DeepPartial<NodeSettingsDto> = {}) {
+        super(settings);
+
+        this.on("updated", this.onUpdated);
+        fs.watchFile(this.filePath, this.onFileChange);
+    }
+
     public static async init(filePath: string): Promise<NodeSettings> {
-        const data = await fs.readJson(filePath);
-        return new NodeSettings(data);
+        const fileContents = await fs.readFile(filePath, {
+            encoding: "utf8"
+        });
+        const data = ini.parse(fileContents);
+
+        return new NodeSettings(filePath, data);
     }
 
     protected getDefaultSettings(): DefaultSettings<NodeSettingsDto> {
@@ -89,7 +105,30 @@ export class NodeSettings extends SettingsScopeBase<NodeSettingsDto> {
             controller: new ControllerSettings(this.settings.controller),
             wallet: new WalletSettings(this.settings.wallet),
             storage: new StorageSettings(this.settings.storage),
-            whitelist: new WhitelistSettings(this.settings.whitelist)
+            whitelist: new WhitelistSettings(this.settings.whitelist),
+            sockets: new SocketsSettings(this.settings.sockets)
         };
     }
+
+    private onUpdated = async () => {
+        const nextState = this.getAll();
+
+        const iniData: string = ini.encode(nextState, {
+            section: "node",
+            whitespace: true
+        });
+
+        const header: string = "# NOIA Node settings file." + os.EOL;
+
+        await fs.writeFile(this.filePath, header + iniData);
+    };
+
+    private onFileChange = async () => {
+        const fileContents = await fs.readFile(this.filePath, {
+            encoding: "utf8"
+        });
+        const data = ini.parse(fileContents);
+
+        console.log(data);
+    };
 }
