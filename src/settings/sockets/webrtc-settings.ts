@@ -9,7 +9,7 @@ export interface WebRtcSettingsDto {
 }
 
 export class WebRtcSettings extends SettingsScopeBase<WebRtcSettingsDto> {
-    protected getDefaultSettings(): DefaultSettings<WebRtcSettingsDto> {
+    public getDefaultSettings(): DefaultSettings<WebRtcSettingsDto> {
         return {
             isEnabled: false,
             controlIp: "",

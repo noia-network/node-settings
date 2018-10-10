@@ -5,7 +5,7 @@ export interface WhitelistSettingsDto {
 }
 
 export class WhitelistSettings extends SettingsScopeBase<WhitelistSettingsDto> {
-    protected getDefaultSettings(): DefaultSettings<WhitelistSettingsDto> {
+    public getDefaultSettings(): DefaultSettings<WhitelistSettingsDto> {
         return {
             masters: ["*"]
         };

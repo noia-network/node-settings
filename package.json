@@ -4,6 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
+        "test": "jest",
+        "test:watch": "jest --watchAll --coverage false",
         "build": "tsc -p .",
         "watch": "tsc -p . -w"
     },

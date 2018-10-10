@@ -7,7 +7,7 @@ export interface WebSocketSettingsDto {
 }
 
 export class WebSocketSettings extends SettingsScopeBase<WebSocketSettingsDto> {
-    protected getDefaultSettings(): DefaultSettings<WebSocketSettingsDto> {
+    public getDefaultSettings(): DefaultSettings<WebSocketSettingsDto> {
         return {
             isEnabled: false,
             ip: "",

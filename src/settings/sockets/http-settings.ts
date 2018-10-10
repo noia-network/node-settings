@@ -7,7 +7,7 @@ export interface HttpSettingsDto {
 }
 
 export class HttpSettings extends SettingsScopeBase<HttpSettingsDto> {
-    protected getDefaultSettings(): DefaultSettings<HttpSettingsDto> {
+    public getDefaultSettings(): DefaultSettings<HttpSettingsDto> {
         return {
             isEnabled: false,
             ip: "",

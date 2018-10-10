@@ -8,7 +8,7 @@ export interface SslSettingsDto {
 }
 
 export class SslSettings extends SettingsScopeBase<SslSettingsDto> {
-    protected getDefaultSettings(): DefaultSettings<SslSettingsDto> {
+    public getDefaultSettings(): DefaultSettings<SslSettingsDto> {
         return {
             isEnabled: false,
             crtBundlePath: "",

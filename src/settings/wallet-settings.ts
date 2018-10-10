@@ -10,7 +10,7 @@ export interface WalletSettingsDto {
 }
 
 export class WalletSettings extends SettingsScopeBase<WalletSettingsDto> {
-    protected getDefaultSettings(): DefaultSettings<WalletSettingsDto> {
+    public getDefaultSettings(): DefaultSettings<WalletSettingsDto> {
         return {
             address: "",
             mnemonic: "",

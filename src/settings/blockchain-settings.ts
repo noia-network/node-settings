@@ -18,7 +18,7 @@ export interface BlockchainSettingsDto {
 }
 
 export class BlockchainSettings extends SettingsScopeBase<BlockchainSettingsDto> {
-    protected getDefaultSettings(): DefaultSettings<BlockchainSettingsDto> {
+    public getDefaultSettings(): DefaultSettings<BlockchainSettingsDto> {
         return {
             isEnabled: false,
             doCreateClient: false,

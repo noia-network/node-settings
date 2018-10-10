@@ -7,7 +7,7 @@ export interface ControllerSettingsDto {
 }
 
 export class ControllerSettings extends SettingsScopeBase<ControllerSettingsDto> {
-    protected getDefaultSettings(): DefaultSettings<ControllerSettingsDto> {
+    public getDefaultSettings(): DefaultSettings<ControllerSettingsDto> {
         return {
             isEnabled: false,
             ip: "127.0.0.1",

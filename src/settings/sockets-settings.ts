@@ -11,7 +11,7 @@ export interface SocketsSettingsDto {
 }
 
 export class SocketsSettings extends SettingsScopeBase<SocketsSettingsDto> {
-    protected getDefaultSettings(): DefaultSettings<SocketsSettingsDto> {
+    public getDefaultSettings(): DefaultSettings<SocketsSettingsDto> {
         return {};
     }
 

@@ -6,7 +6,7 @@ export interface StorageSettingsDto {
 }
 
 export class StorageSettings extends SettingsScopeBase<StorageSettingsDto> {
-    protected getDefaultSettings(): DefaultSettings<StorageSettingsDto> {
+    public getDefaultSettings(): DefaultSettings<StorageSettingsDto> {
         return {
             dir: "",
             size: 0

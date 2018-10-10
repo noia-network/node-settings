@@ -61,23 +61,26 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
         return this.scopes;
     }
 
-    public getAll(): TSettings {
+    public getSettings(): TSettings {
         const currentSettings: { [key: string]: unknown } = this.settings as {};
 
         for (const scopeKey of Object.keys(this.scopes)) {
-            currentSettings[scopeKey] = this.scopes[scopeKey].getAll();
+            currentSettings[scopeKey] = this.scopes[scopeKey].getSettings();
         }
 
         return currentSettings as TSettings;
     }
 
-    public updateItem<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey, value: TSettings[TKey]): void {
+    public set<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey, value: TSettings[TKey]): void {
+        if (this.settings[key] === value) {
+            return;
+        }
+
         this.settings[key] = value;
         this.emit("updated", [key as string], (value as any) as Primitive);
     }
 
-    public update(nextSettings: Partial<TSettings>): void {
-        const prevSettings: { [key: string]: unknown } = this.settings;
+    public hydrate(nextSettings: Partial<TSettings> = {}): void {
         const settings = {
             ...(this.getDefaultSettings() as {}),
             ...(nextSettings as {})
@@ -86,14 +89,8 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
         for (const key of Object.keys(nextSettings)) {
             const value: unknown = (nextSettings as { [key: string]: unknown })[key];
 
-            if (Helpers.isPrimitiveOrArrayOfPrimitives(value)) {
-                if (prevSettings[key] !== value) {
-                    this.updateItem(key as any, value as any);
-                }
-            } else {
-                if (this.scopes[key] != null) {
-                    this.scopes[key].update(value as {});
-                }
+            if (!Helpers.isPrimitiveOrArrayOfPrimitives(value) && this.scopes[key] != null) {
+                this.scopes[key].hydrate(value as {});
             }
         }
 
@@ -101,5 +98,5 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
     }
 
     protected abstract initScopedSettings(): ScopedSettings<TSettings>;
-    protected abstract getDefaultSettings(): DefaultSettings<TSettings>;
+    public abstract getDefaultSettings(): DefaultSettings<TSettings>;
 }

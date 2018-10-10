@@ -22,7 +22,7 @@ interface NodeSettingsSocketsWebSocket {
 }
 
 class Settings extends SettingsScopeBase<NodeSettings> {
-    protected getDefaultSettings(): DefaultSettings<NodeSettings> {
+    public getDefaultSettings(): DefaultSettings<NodeSettings> {
         return {
             version: "0.0.0",
             statisticsPath: ""
@@ -37,7 +37,7 @@ class Settings extends SettingsScopeBase<NodeSettings> {
 }
 
 class SocketsSettings extends SettingsScopeBase<NodeSettingsSockets> {
-    protected getDefaultSettings(): DefaultSettings<NodeSettingsSockets> {
+    public getDefaultSettings(): DefaultSettings<NodeSettingsSockets> {
         return {};
     }
 
@@ -50,7 +50,7 @@ class SocketsSettings extends SettingsScopeBase<NodeSettingsSockets> {
 }
 
 class WebRtcSettings extends SettingsScopeBase<NodeSettingsSocketsWebRtc> {
-    protected getDefaultSettings(): DefaultSettings<NodeSettingsSocketsWebRtc> {
+    public getDefaultSettings(): DefaultSettings<NodeSettingsSocketsWebRtc> {
         return {
             isEnabled: false,
             port: 0
@@ -62,7 +62,7 @@ class WebRtcSettings extends SettingsScopeBase<NodeSettingsSocketsWebRtc> {
     }
 }
 class WebSocketSettings extends SettingsScopeBase<NodeSettingsSocketsWebSocket> {
-    protected getDefaultSettings(): DefaultSettings<NodeSettingsSocketsWebSocket> {
+    public getDefaultSettings(): DefaultSettings<NodeSettingsSocketsWebSocket> {
         return {
             isEnabled: false,
             port: 0
@@ -80,17 +80,67 @@ const SETTINGS_EXAMPLE = {
     sockets: {
         webrtc: {
             isEnabled: false,
-            port: 0
+            port: 1000
         },
         ws: {
             isEnabled: false,
-            port: 0
+            port: 1001
         }
     }
 };
 
-it("First test", () => {
+it("gets settings item by key.", () => {
     const settings = new Settings(SETTINGS_EXAMPLE);
 
     expect(settings.get("version")).toBe(SETTINGS_EXAMPLE.version);
+});
+
+it("gets whole settings object.", () => {
+    const settings = new Settings(SETTINGS_EXAMPLE);
+
+    expect(settings.getSettings()).toMatchObject(SETTINGS_EXAMPLE);
+});
+
+it("emits an event when item is updated.", async done => {
+    const settings = new Settings(SETTINGS_EXAMPLE);
+    const key: keyof NodeSettings = "statisticsPath";
+    const nextValue = "NEXT_VALUE";
+    settings.on("updated", (keys, value) => {
+        expect(keys[0]).toBe(key);
+        expect(value).toBe(nextValue);
+        done();
+    });
+
+    settings.set(key, nextValue);
+});
+
+it("does NOT emit an event when value is the same.", async done => {
+    const settings = new Settings(SETTINGS_EXAMPLE);
+    const key: keyof NodeSettings = "statisticsPath";
+    const sameValue = settings.get(key);
+    const stub = jest.fn();
+
+    settings.on("updated", stub);
+
+    settings.set(key, sameValue);
+    setTimeout(() => {
+        expect(stub).not.toBeCalled();
+        done();
+    }, 0);
+});
+
+it("hydrates with new settings object.", () => {
+    const settings = new WebRtcSettings({
+        isEnabled: false,
+        port: 1000
+    });
+    const nextIsEnabled = true;
+
+    settings.hydrate({
+        isEnabled: nextIsEnabled
+    });
+
+    expect(settings.get("isEnabled")).toBe(nextIsEnabled);
+    expect(settings.get("port")).toBe(settings.getDefaultSettings().port);
+    expect(settings.getSettings()).not.toMatchObject(SETTINGS_EXAMPLE);
 });

@@ -77,7 +77,7 @@ export class NodeSettings extends SettingsScopeBase<NodeSettingsDto> {
 
     private static readonly iniScopeName: string = "node";
 
-    protected getDefaultSettings(): DefaultSettings<NodeSettingsDto> {
+    public getDefaultSettings(): DefaultSettings<NodeSettingsDto> {
         return {
             isHeadless: false,
             statisticsPath: null,
@@ -132,17 +132,17 @@ export class NodeSettings extends SettingsScopeBase<NodeSettingsDto> {
     }
 
     private onUpdated = async () => {
-        const nextSettingsState = this.getAll();
+        const nextSettingsState = this.getSettings();
         await this.writeConfig(nextSettingsState);
     };
 
     private onFileChange = async () => {
         const data = await NodeSettings.readConfig(this.filePath);
-        this.update(data);
+        this.hydrate(data);
 
-        if (!deepEqual(data, this.getAll(), { strict: true })) {
+        if (!deepEqual(data, this.getSettings(), { strict: true })) {
             console.log("Settings file is incomplete. Updating...");
-            this.writeConfig(this.getAll());
+            this.writeConfig(this.getSettings());
         }
     };
 }
