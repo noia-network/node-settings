@@ -1,6 +1,9 @@
-import * as fs from "fs-extra";
+import * as fs from "fs";
 import * as ini from "ini";
 import * as os from "os";
+import * as chokidar from "chokidar";
+import deepEqual = require("deep-equal");
+import { promisify } from "util";
 
 import { SettingsScopeBase, DefaultSettings, ScopedSettings } from "../abstractions/settings-scope-base";
 
@@ -16,7 +19,7 @@ import { SocketsSettings, SocketsSettingsDto } from "./sockets-settings";
 import { BlockchainSettings, BlockchainSettingsDto } from "./blockchain-settings";
 
 export interface NodeSettingsDto {
-    statisticsPath: string;
+    statisticsPath: string | null;
     /**
      * False if node GUI.
      */
@@ -24,7 +27,7 @@ export interface NodeSettingsDto {
     /**
      * Domain SSL is valid for.
      */
-    domain: string;
+    domain: string | null;
     /**
      * Master address to connect to if skipping blockchain.
      */
@@ -61,23 +64,24 @@ export class NodeSettings extends SettingsScopeBase<NodeSettingsDto> {
         super(settings);
 
         this.on("updated", this.onUpdated);
-        fs.watchFile(this.filePath, this.onFileChange);
+        this.settingsWatcher = chokidar.watch(filePath).on("change", this.onFileChange);
     }
 
+    private settingsWatcher: chokidar.FSWatcher;
+
     public static async init(filePath: string): Promise<NodeSettings> {
-        const fileContents = await fs.readFile(filePath, {
-            encoding: "utf8"
-        });
-        const data = ini.parse(fileContents);
+        const data = await this.readConfig(filePath);
 
         return new NodeSettings(filePath, data);
     }
 
+    private static readonly iniScopeName: string = "node";
+
     protected getDefaultSettings(): DefaultSettings<NodeSettingsDto> {
         return {
             isHeadless: false,
-            statisticsPath: "",
-            domain: "",
+            statisticsPath: null,
+            domain: null,
             masterAddress: "",
             nodeId: Helpers.randomString(40),
             natPmp: false,
@@ -97,25 +101,48 @@ export class NodeSettings extends SettingsScopeBase<NodeSettingsDto> {
         };
     }
 
-    private onUpdated = async () => {
-        const nextState = this.getAll();
+    private static async readConfig(filePath: string): Promise<Partial<NodeSettingsDto>> {
+        const fileContents = await promisify(fs.readFile)(filePath, { encoding: "utf8" });
 
-        const iniData: string = ini.encode(nextState, {
-            section: "node",
+        let data: Partial<NodeSettingsDto>;
+        if (fileContents == null || fileContents === "") {
+            data = {};
+        } else {
+            const resolvedData = ini.parse(fileContents);
+            const scopedData = resolvedData[this.iniScopeName];
+
+            data = typeof scopedData === "object" ? scopedData : {};
+        }
+
+        return data;
+    }
+
+    private async writeConfig(data: NodeSettingsDto): Promise<void> {
+        // We don't listen to file changes while updating file.
+        this.settingsWatcher.removeAllListeners();
+
+        const iniData: string = ini.encode({ [NodeSettings.iniScopeName]: data }, {
             whitespace: true
-        });
+        } as any);
 
         const header: string = "# NOIA Node settings file." + os.EOL;
 
-        await fs.writeFile(this.filePath, header + iniData);
+        await promisify(fs.writeFile)(this.filePath, header + iniData);
+        this.settingsWatcher.on("change", this.onFileChange);
+    }
+
+    private onUpdated = async () => {
+        const nextSettingsState = this.getAll();
+        await this.writeConfig(nextSettingsState);
     };
 
     private onFileChange = async () => {
-        const fileContents = await fs.readFile(this.filePath, {
-            encoding: "utf8"
-        });
-        const data = ini.parse(fileContents);
+        const data = await NodeSettings.readConfig(this.filePath);
+        this.update(data);
 
-        console.log(data);
+        if (!deepEqual(data, this.getAll(), { strict: true })) {
+            console.log("Settings file is incomplete. Updating...");
+            this.writeConfig(this.getAll());
+        }
     };
 }

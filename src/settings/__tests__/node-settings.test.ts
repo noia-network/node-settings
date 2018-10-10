@@ -1,9 +1,11 @@
 import * as path from "path";
 import { NodeSettings } from "../node-settings";
 
-it("Node settings parse", () => {
+it("Node settings parse", async () => {
     const settingsPath = path.resolve(__dirname, "./settings.ini");
-    const settings = new NodeSettings(settingsPath, {});
+    const settings = await NodeSettings.init(settingsPath);
 
-    settings.update("natPmp", false);
+    settings.updateItem("natPmp", false);
+
+    // expect(settings.getAll()).toMatchSnapshot();
 });

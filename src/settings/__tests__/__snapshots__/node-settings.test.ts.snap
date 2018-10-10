@@ -1,0 +1,221 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Node settings parse 1`] = `
+Object {
+  "blockchain": Object {
+    "address": "",
+    "client": "",
+    "doCreateClient": false,
+    "isEnabled": false,
+    "lastBlockPosition": "",
+    "mnemonic": "",
+    "providerUrl": "",
+    "workOrder": "",
+  },
+  "controller": Object {
+    "ip": "127.0.0.1",
+    "isEnabled": false,
+    "port": 9000,
+  },
+  "domain": "",
+  "isHeadless": false,
+  "masterAddress": "",
+  "natPmp": false,
+  "node": Object {
+    "blockchain": Object {
+      "address": "",
+      "client": "",
+      "doCreateClient": false,
+      "isEnabled": false,
+      "lastBlockPosition": "",
+      "mnemonic": "",
+      "providerUrl": "",
+      "workOrder": "",
+    },
+    "controller": Object {
+      "ip": "127.0.0.1",
+      "isEnabled": false,
+      "port": "9000",
+    },
+    "domain": "",
+    "isHeadless": false,
+    "masterAddress": "",
+    "natPmp": false,
+    "node": Object {
+      "blockchain": Object {
+        "address": "",
+        "client": "",
+        "doCreateClient": false,
+        "isEnabled": false,
+        "lastBlockPosition": "",
+        "mnemonic": "",
+        "providerUrl": "",
+        "workOrder": "",
+      },
+      "controller": Object {
+        "ip": "127.0.0.1",
+        "isEnabled": false,
+        "port": "9000",
+      },
+      "domain": "",
+      "isHeadless": false,
+      "masterAddress": "",
+      "natPmp": false,
+      "node": Object {
+        "blockchain": Object {
+          "address": "",
+          "client": "",
+          "doCreateClient": false,
+          "isEnabled": false,
+          "lastBlockPosition": "",
+          "mnemonic": "",
+          "providerUrl": "",
+          "workOrder": "",
+        },
+        "controller": Object {
+          "ip": "127.0.0.1",
+          "isEnabled": false,
+          "port": "9000",
+        },
+        "domain": "",
+        "isHeadless": false,
+        "masterAddress": "",
+        "natPmp": false,
+        "nodeId": "KJDQ9dtftFXJwhk5eoFfbY4LnDcNw0X8M1kwGqdV",
+        "publicIp": "",
+        "sockets": Object {
+          "http": Object {
+            "ip": "",
+            "isEnabled": false,
+            "port": "0",
+          },
+          "wrtc": Object {
+            "controlIp": "",
+            "controlPort": "0",
+            "dataIp": "",
+            "dataPort": "0",
+            "isEnabled": false,
+          },
+          "ws": Object {
+            "ip": "",
+            "isEnabled": false,
+            "port": "0",
+          },
+        },
+        "statisticsPath": "",
+        "storage": Object {
+          "dir": "",
+          "size": "0",
+        },
+        "userDataPath": "",
+        "wallet": Object {
+          "address": "",
+          "mnemonic": "",
+          "providerUrl": "undefined",
+        },
+      },
+      "nodeId": "tWgqeA2NYmICmpzn2KsQ986omjVrg45XWdZchpSl",
+      "publicIp": "",
+      "sockets": Object {
+        "http": Object {
+          "ip": "",
+          "isEnabled": false,
+          "port": "0",
+        },
+        "wrtc": Object {
+          "controlIp": "",
+          "controlPort": "0",
+          "dataIp": "",
+          "dataPort": "0",
+          "isEnabled": false,
+        },
+        "ws": Object {
+          "ip": "",
+          "isEnabled": false,
+          "port": "0",
+        },
+      },
+      "statisticsPath": "",
+      "storage": Object {
+        "dir": "",
+        "size": "0",
+      },
+      "userDataPath": "",
+      "wallet": Object {
+        "address": "",
+        "mnemonic": "",
+        "providerUrl": "undefined",
+      },
+    },
+    "nodeId": "3CopykvbhlzzfLQkrK8zukEBnzXaRoNfk6Qnt1Gc",
+    "publicIp": "",
+    "sockets": Object {
+      "http": Object {
+        "ip": "",
+        "isEnabled": false,
+        "port": "0",
+      },
+      "wrtc": Object {
+        "controlIp": "",
+        "controlPort": "0",
+        "dataIp": "",
+        "dataPort": "0",
+        "isEnabled": false,
+      },
+      "ws": Object {
+        "ip": "",
+        "isEnabled": false,
+        "port": "0",
+      },
+    },
+    "statisticsPath": "",
+    "storage": Object {
+      "dir": "",
+      "size": "0",
+    },
+    "userDataPath": "",
+    "wallet": Object {
+      "address": "",
+      "mnemonic": "",
+      "providerUrl": "undefined",
+    },
+  },
+  "nodeId": "cqXfA9Z4ijU4owm0xJ0dQx5v5YSISM1Rwy2aVper",
+  "publicIp": "",
+  "sockets": Object {
+    "http": Object {
+      "ip": "",
+      "isEnabled": false,
+      "port": 0,
+    },
+    "wrtc": Object {
+      "controlIp": "",
+      "controlPort": 0,
+      "dataIp": "",
+      "dataPort": 0,
+      "isEnabled": false,
+    },
+    "ws": Object {
+      "ip": "",
+      "isEnabled": false,
+      "port": 0,
+    },
+  },
+  "statisticsPath": "",
+  "storage": Object {
+    "dir": "",
+    "size": 0,
+  },
+  "userDataPath": "",
+  "wallet": Object {
+    "address": "",
+    "mnemonic": "",
+    "providerUrl": undefined,
+  },
+  "whitelist": Object {
+    "masters": Array [
+      "*",
+    ],
+  },
+}
+`;

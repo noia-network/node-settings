@@ -71,22 +71,29 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
         return currentSettings as TSettings;
     }
 
-    public updateKey<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey, value: TSettings[TKey]): void {
+    public updateItem<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey, value: TSettings[TKey]): void {
         this.settings[key] = value;
         this.emit("updated", [key as string], (value as any) as Primitive);
     }
 
     public update(nextSettings: Partial<TSettings>): void {
+        const prevSettings: { [key: string]: unknown } = this.settings;
         const settings = {
-            ...(this.settings as {}),
+            ...(this.getDefaultSettings() as {}),
             ...(nextSettings as {})
         } as TSettings;
 
         for (const key of Object.keys(nextSettings)) {
             const value: unknown = (nextSettings as { [key: string]: unknown })[key];
 
-            if (!Helpers.isPrimitiveOrArrayOfPrimitives(value)) {
-                this.scopes[key].update(value as {});
+            if (Helpers.isPrimitiveOrArrayOfPrimitives(value)) {
+                if (prevSettings[key] !== value) {
+                    this.updateItem(key as any, value as any);
+                }
+            } else {
+                if (this.scopes[key] != null) {
+                    this.scopes[key].update(value as {});
+                }
             }
         }
 
