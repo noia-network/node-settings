@@ -1,3 +1,5 @@
+import { Primitive } from "./contracts/types-helpers";
+
 export namespace Helpers {
     export function randomString(len: number = 5): string {
         let text = "";
@@ -6,5 +8,9 @@ export namespace Helpers {
             text += possible.charAt(Math.floor(Math.random() * possible.length));
         }
         return text;
+    }
+
+    export function isPrimitiveOrArrayOfPrimitives(a: unknown): a is Primitive | Array<Primitive> {
+        return typeof a === "string" || typeof a === "number" || typeof a === "boolean" || a == null || Array.isArray(a);
     }
 }

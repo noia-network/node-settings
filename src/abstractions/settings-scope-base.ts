@@ -8,6 +8,7 @@ import {
     ExcludePrimitiveAndPrimitiveArrayKeys,
     PrimitiveAndPrimitiveArrayProperties
 } from "../contracts/types-helpers";
+import { Helpers } from "../helpers";
 
 export interface SettingsScopeEvents {
     updated: (key: string[], value: Primitive | Primitive[]) => void;
@@ -45,8 +46,8 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
         }
     }
 
-    protected readonly settings: TSettings;
-    protected readonly scopes: ScopedSettings<TSettings>;
+    protected settings: TSettings;
+    protected scopes: ScopedSettings<TSettings>;
 
     public get<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey): TSettings[TKey] {
         return this.settings[key];
@@ -70,9 +71,26 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
         return currentSettings as TSettings;
     }
 
-    public update<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey, value: TSettings[TKey]): void {
+    public updateKey<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey, value: TSettings[TKey]): void {
         this.settings[key] = value;
         this.emit("updated", [key as string], (value as any) as Primitive);
+    }
+
+    public update(nextSettings: Partial<TSettings>): void {
+        const settings = {
+            ...(this.settings as {}),
+            ...(nextSettings as {})
+        } as TSettings;
+
+        for (const key of Object.keys(nextSettings)) {
+            const value: unknown = (nextSettings as { [key: string]: unknown })[key];
+
+            if (!Helpers.isPrimitiveOrArrayOfPrimitives(value)) {
+                this.scopes[key].update(value as {});
+            }
+        }
+
+        this.settings = settings;
     }
 
     protected abstract initScopedSettings(): ScopedSettings<TSettings>;
