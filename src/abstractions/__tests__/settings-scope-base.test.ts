@@ -123,6 +123,7 @@ it("does NOT emit an event when value is the same.", async done => {
     settings.on("updated", stub);
 
     settings.update(key, sameValue);
+
     setTimeout(() => {
         expect(stub).not.toBeCalled();
         done();

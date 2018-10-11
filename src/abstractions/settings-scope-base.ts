@@ -125,7 +125,7 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
     }
 
     public update<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey, value: TSettings[TKey]): void {
-        if (this.settings[key] === value && !Helpers.isPrimitiveOrArrayOfPrimitives(value)) {
+        if (this.settings[key] === value || !Helpers.isPrimitiveOrArrayOfPrimitives(value)) {
             return;
         }
 
