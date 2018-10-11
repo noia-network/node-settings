@@ -19,3 +19,4 @@ export type ExcludePrimitiveAndPrimitiveArrayKeys<T> = ExcludeKeysExtend<T, Prim
 export type ExcludePrimitiveAndPrimitiveArrayProperties<T> = ExcludePropertiesExtend<T, Primitive | Primitive[]>;
 
 export type DeepPartial<T> = { [K in keyof T]?: Partial<T[K]> };
+export type ExceptUndefined<T> = T extends undefined ? never : T;
