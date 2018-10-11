@@ -1,4 +1,4 @@
-import { SettingsScopeBase, DefaultSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
 
 export interface ControllerSettingsDto {
     isEnabled: boolean;
@@ -7,7 +7,7 @@ export interface ControllerSettingsDto {
 }
 
 export class ControllerSettings extends SettingsScopeBase<ControllerSettingsDto> {
-    public getDefaultSettings(): DefaultSettings<ControllerSettingsDto> {
+    public getDefaultSettings(): ScopeSettings<ControllerSettingsDto> {
         return {
             isEnabled: false,
             ip: "127.0.0.1",

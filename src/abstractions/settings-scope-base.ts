@@ -24,7 +24,7 @@ export type ScopedSettings<TValue> = {
         ExcludePrimitiveAndPrimitiveArrayProperties<TValue>[T]
     >
 };
-export type DefaultSettings<TSettings> = PrimitiveAndPrimitiveArrayProperties<TSettings>;
+export type ScopeSettings<TSettings> = PrimitiveAndPrimitiveArrayProperties<TSettings>;
 
 const SettingsScopeEmitter: { new (): StrictEventEmitter<EventEmitter, SettingsScopeEvents> } = EventEmitter;
 
@@ -37,9 +37,16 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
             absoluteKey: scopeKey
         };
 
-        this.settings = {
+        const wholeSettings = {
             ...(this.getDefaultSettings() as {}),
             ...(settings as {})
+        } as TSettings;
+
+        const validated = this.validate(wholeSettings);
+
+        this.settings = {
+            ...(wholeSettings as {}),
+            ...(validated as {})
         } as TSettings;
 
         this.scopes = this.initScopedSettings();
@@ -129,7 +136,18 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
             return;
         }
 
-        this.settings[key] = value;
+        const nextSettings = {
+            ...(this.settings as {}),
+            [key]: value
+        } as TSettings;
+
+        const validatedSettings = this.validate(nextSettings);
+
+        this.settings = {
+            ...(nextSettings as {}),
+            ...(validatedSettings as {})
+        } as TSettings;
+
         const event: UpdatedEvent = {
             scope: this.scope,
             setting: {
@@ -144,5 +162,9 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
     }
 
     protected abstract initScopedSettings(): ScopedSettings<TSettings>;
-    public abstract getDefaultSettings(): DefaultSettings<TSettings>;
+    public abstract getDefaultSettings(): ScopeSettings<TSettings>;
+
+    protected validate(settings: ScopeSettings<TSettings>): ScopeSettings<TSettings> {
+        return settings;
+    }
 }

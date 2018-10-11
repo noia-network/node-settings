@@ -1,4 +1,4 @@
-import { SettingsScopeBase, DefaultSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
 
 export interface SslSettingsDto {
     isEnabled: boolean;
@@ -8,7 +8,7 @@ export interface SslSettingsDto {
 }
 
 export class SslSettings extends SettingsScopeBase<SslSettingsDto> {
-    public getDefaultSettings(): DefaultSettings<SslSettingsDto> {
+    public getDefaultSettings(): ScopeSettings<SslSettingsDto> {
         return {
             isEnabled: false,
             crtBundlePath: "",

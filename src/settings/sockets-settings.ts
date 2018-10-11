@@ -1,4 +1,4 @@
-import { SettingsScopeBase, DefaultSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
 
 import { WebRtcSettings, WebRtcSettingsDto } from "./sockets/webrtc-settings";
 import { HttpSettings, HttpSettingsDto } from "./sockets/http-settings";
@@ -11,7 +11,7 @@ export interface SocketsSettingsDto {
 }
 
 export class SocketsSettings extends SettingsScopeBase<SocketsSettingsDto> {
-    public getDefaultSettings(): DefaultSettings<SocketsSettingsDto> {
+    public getDefaultSettings(): ScopeSettings<SocketsSettingsDto> {
         return {};
     }
 

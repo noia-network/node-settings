@@ -1,11 +1,11 @@
-import { SettingsScopeBase, DefaultSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
 
 export interface WhitelistSettingsDto {
     masters: string[];
 }
 
 export class WhitelistSettings extends SettingsScopeBase<WhitelistSettingsDto> {
-    public getDefaultSettings(): DefaultSettings<WhitelistSettingsDto> {
+    public getDefaultSettings(): ScopeSettings<WhitelistSettingsDto> {
         return {
             masters: ["*"]
         };

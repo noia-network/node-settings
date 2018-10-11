@@ -1,4 +1,4 @@
-import { SettingsScopeBase, DefaultSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
 
 export interface WalletSettingsDto {
     address: string;
@@ -10,7 +10,7 @@ export interface WalletSettingsDto {
 }
 
 export class WalletSettings extends SettingsScopeBase<WalletSettingsDto> {
-    public getDefaultSettings(): DefaultSettings<WalletSettingsDto> {
+    public getDefaultSettings(): ScopeSettings<WalletSettingsDto> {
         return {
             address: "",
             mnemonic: "",

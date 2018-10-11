@@ -1,4 +1,4 @@
-import { SettingsScopeBase, DefaultSettings, ScopedSettings } from "../../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../../abstractions/settings-scope-base";
 
 export interface WebSocketSettingsDto {
     isEnabled: boolean;
@@ -7,7 +7,7 @@ export interface WebSocketSettingsDto {
 }
 
 export class WebSocketSettings extends SettingsScopeBase<WebSocketSettingsDto> {
-    public getDefaultSettings(): DefaultSettings<WebSocketSettingsDto> {
+    public getDefaultSettings(): ScopeSettings<WebSocketSettingsDto> {
         return {
             isEnabled: false,
             ip: "",

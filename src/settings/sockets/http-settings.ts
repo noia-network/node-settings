@@ -1,4 +1,4 @@
-import { SettingsScopeBase, DefaultSettings, ScopedSettings } from "../../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../../abstractions/settings-scope-base";
 
 export interface HttpSettingsDto {
     isEnabled: boolean;
@@ -7,7 +7,7 @@ export interface HttpSettingsDto {
 }
 
 export class HttpSettings extends SettingsScopeBase<HttpSettingsDto> {
-    public getDefaultSettings(): DefaultSettings<HttpSettingsDto> {
+    public getDefaultSettings(): ScopeSettings<HttpSettingsDto> {
         return {
             isEnabled: false,
             ip: "",

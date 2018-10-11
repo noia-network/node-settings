@@ -1,4 +1,4 @@
-import { SettingsScopeBase, DefaultSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
 
 export interface BlockchainSettingsDto {
     /**
@@ -18,7 +18,7 @@ export interface BlockchainSettingsDto {
 }
 
 export class BlockchainSettings extends SettingsScopeBase<BlockchainSettingsDto> {
-    public getDefaultSettings(): DefaultSettings<BlockchainSettingsDto> {
+    public getDefaultSettings(): ScopeSettings<BlockchainSettingsDto> {
         return {
             isEnabled: false,
             doCreateClient: false,

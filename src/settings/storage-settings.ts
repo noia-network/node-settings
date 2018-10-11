@@ -1,4 +1,4 @@
-import { SettingsScopeBase, DefaultSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
 
 export interface StorageSettingsDto {
     dir: string;
@@ -6,7 +6,7 @@ export interface StorageSettingsDto {
 }
 
 export class StorageSettings extends SettingsScopeBase<StorageSettingsDto> {
-    public getDefaultSettings(): DefaultSettings<StorageSettingsDto> {
+    public getDefaultSettings(): ScopeSettings<StorageSettingsDto> {
         return {
             dir: "",
             size: 0

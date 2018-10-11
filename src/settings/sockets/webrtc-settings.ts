@@ -1,4 +1,4 @@
-import { SettingsScopeBase, DefaultSettings, ScopedSettings } from "../../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../../abstractions/settings-scope-base";
 
 export interface WebRtcSettingsDto {
     isEnabled: boolean;
@@ -9,7 +9,7 @@ export interface WebRtcSettingsDto {
 }
 
 export class WebRtcSettings extends SettingsScopeBase<WebRtcSettingsDto> {
-    public getDefaultSettings(): DefaultSettings<WebRtcSettingsDto> {
+    public getDefaultSettings(): ScopeSettings<WebRtcSettingsDto> {
         return {
             isEnabled: false,
             controlIp: "",

@@ -4,7 +4,7 @@ import * as os from "os";
 import { promisify } from "util";
 
 import { SettingsBase, SettingsBaseDto } from "../abstractions/settings-base";
-import { DefaultSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
 
 import { Helpers } from "../helpers";
 
@@ -81,7 +81,7 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
         return instance;
     }
 
-    public getDefaultSettings(): DefaultSettings<NodeSettingsDto> {
+    public getDefaultSettings(): ScopeSettings<NodeSettingsDto> {
         return {
             version: "1.0.0",
             isHeadless: false,
