@@ -1,4 +1,5 @@
 import * as chokidar from "chokidar";
+import debounce = require("lodash.debounce");
 
 import { SettingsScopeBase } from "./settings-scope-base";
 import { DeepPartial } from "../contracts/types-helpers";
@@ -17,18 +18,16 @@ export abstract class SettingsBase<TSettings extends SettingsBaseDto> extends Se
     }
 
     private settingsWatcher: chokidar.FSWatcher;
+    private isReadingFile: boolean = false;
 
     public abstract async readSettings(): Promise<Partial<TSettings>>;
     protected abstract async writeSettingsHandler(settings: TSettings): Promise<void>;
-    private ignoreFileUpdates: boolean = false;
 
     public async writeSettings(settings: TSettings): Promise<void> {
         // We don't listen to file changes while updating file.
         this.settingsWatcher.removeAllListeners();
-        this.ignoreFileUpdates = true;
         await this.writeSettingsHandler(settings);
         this.settingsWatcher.on("change", this.onFileChange);
-        this.ignoreFileUpdates = false;
     }
 
     private async onUpdated(): Promise<void> {
@@ -36,17 +35,26 @@ export abstract class SettingsBase<TSettings extends SettingsBaseDto> extends Se
         await this.writeSettings(nextSettingsState);
     }
 
-    private onFileChange = async () => {
-        if (this.ignoreFileUpdates) {
+    private onFileChange = debounce(async () => {
+        console.log("ON file changed.");
+        if (this.isReadingFile) {
             return;
         }
 
-        const data = await this.readSettings();
-        this.hydrate(data);
-        const currentSettings = this.dehydrate();
+        try {
+            this.isReadingFile = true;
+            const data = await this.readSettings();
+            this.isReadingFile = false;
+            this.hydrate(data);
 
-        if (!Helpers.compareObjects(currentSettings, data)) {
-            this.writeSettings(currentSettings);
+            const updatedSettings = this.dehydrate();
+            if (!Helpers.compareObjects(updatedSettings, data)) {
+                console.log("Objects are not identical.");
+                console.log(updatedSettings, data);
+                this.writeSettings(updatedSettings);
+            }
+        } catch (error) {
+            console.error("Tried reading file. Failed to resolve format.");
         }
-    };
+    }, 100);
 }

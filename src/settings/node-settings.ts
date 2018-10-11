@@ -1,7 +1,6 @@
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import * as ini from "ini";
 import * as os from "os";
-import { promisify } from "util";
 
 import { SettingsBase, SettingsBaseDto } from "../abstractions/settings-base";
 import { ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
@@ -16,6 +15,7 @@ import { WhitelistSettings, WhitelistSettingsDto } from "./whitelist-settings";
 import { SocketsSettings, SocketsSettingsDto } from "./sockets-settings";
 import { BlockchainSettings, BlockchainSettingsDto } from "./blockchain-settings";
 import { DeepPartial } from "../contracts/types-helpers";
+import { Validate } from "../validator";
 
 export interface NodeSettingsDto extends SettingsBaseDto {
     statisticsPath: string | null;
@@ -30,7 +30,7 @@ export interface NodeSettingsDto extends SettingsBaseDto {
     /**
      * Master address to connect to if skipping blockchain.
      */
-    masterAddress: string;
+    masterAddress: string | null;
     /**
      * Automatic ports mapping using NAT-PMP.
      */
@@ -39,15 +39,15 @@ export interface NodeSettingsDto extends SettingsBaseDto {
      * Node identifier if skipping blockchain.
      * TODO: Implement better generating.
      */
-    nodeId: string;
+    nodeId: string | null;
     /**
      * Public IP that master must use. If empty, master must resolve IP by itself.
      */
-    publicIp: string;
+    publicIp: string | null;
     /**
      * Path to user user data folder. If specified, default settings.json and/or statistics.json will be saved to user data folder.
      */
-    userDataPath: string;
+    userDataPath: string | null;
 
     // SCOPES
     controller: ControllerSettingsDto;
@@ -81,18 +81,37 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
         return instance;
     }
 
+    private readonly version: string = "1.0.0";
+
     public getDefaultSettings(): ScopeSettings<NodeSettingsDto> {
         return {
-            version: "1.0.0",
+            version: this.version,
             isHeadless: false,
             statisticsPath: null,
             domain: null,
-            masterAddress: "",
-            nodeId: Helpers.randomString(40),
+            masterAddress: null,
+            nodeId: null,
             natPmp: false,
-            publicIp: "",
-            userDataPath: ""
+            publicIp: null,
+            userDataPath: null
         };
+    }
+
+    public validate(settings: ScopeSettings<NodeSettingsDto>): ScopeSettings<NodeSettingsDto> {
+        const nodeId = Validate(settings.nodeId, () => Helpers.randomString(40)).isString(false);
+        const result = {
+            version: Validate(settings.version, this.version).isString(false),
+            isHeadless: Validate(settings.isHeadless).isBoolean(),
+            statisticsPath: Validate(settings.statisticsPath, null).isString(false),
+            domain: Validate(settings.domain, null).isString(false),
+            masterAddress: Validate(settings.masterAddress, null).isString(false),
+            nodeId: nodeId,
+            natPmp: Validate(settings.natPmp).isBoolean(),
+            publicIp: Validate(settings.masterAddress, null).isString(false),
+            userDataPath: Validate(settings.userDataPath, null).isString(false)
+        };
+
+        return result;
     }
 
     protected initScopedSettings(): ScopedSettings<NodeSettingsDto> {
@@ -107,7 +126,7 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
     }
 
     public async readSettings(): Promise<Partial<NodeSettingsDto>> {
-        const fileContents = await promisify(fs.readFile)(this.filePath, { encoding: "utf8" });
+        const fileContents = await fs.readFile(this.filePath, { encoding: "utf8" });
 
         let data: Partial<NodeSettingsDto>;
         if (fileContents == null || fileContents === "") {
@@ -129,6 +148,6 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
 
         const header: string = "# NOIA Node settings file." + os.EOL;
 
-        await promisify(fs.writeFile)(this.filePath, header + iniData);
+        await fs.writeFile(this.filePath, header + iniData);
     }
 }

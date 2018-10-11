@@ -28,7 +28,7 @@ export type ScopeSettings<TSettings> = PrimitiveAndPrimitiveArrayProperties<TSet
 
 const SettingsScopeEmitter: { new (): StrictEventEmitter<EventEmitter, SettingsScopeEvents> } = EventEmitter;
 
-export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter {
+export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsScopeEmitter {
     constructor(scopeKey: string, settings: DeepPartial<TSettings>) {
         super();
 
@@ -37,17 +37,7 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
             absoluteKey: scopeKey
         };
 
-        const wholeSettings = {
-            ...(this.getDefaultSettings() as {}),
-            ...(settings as {})
-        } as TSettings;
-
-        const validated = this.validate(wholeSettings);
-        // We don't want to loose additional settings.
-        this.settings = {
-            ...(wholeSettings as {}),
-            ...(validated as {})
-        } as TSettings;
+        this.settings = this.calculateSettings(settings);
 
         this.scopes = this.initScopedSettings();
         // Re-emit to higher levels.
@@ -81,6 +71,23 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
     protected settings: TSettings;
     protected scopes: ScopedSettings<TSettings>;
 
+    protected calculateSettings(settings: DeepPartial<TSettings>): TSettings {
+        const wholeSettings = {
+            ...(this.getDefaultSettings() as {}),
+            ...(settings as {})
+        } as TSettings;
+
+        const validated = this.validate(wholeSettings);
+
+        // We don't want to loose additional settings.
+        const result = {
+            ...(wholeSettings as {}),
+            ...(validated as {})
+        };
+
+        return result as TSettings;
+    }
+
     public get<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey): TSettings[TKey] {
         return this.settings[key];
     }
@@ -95,10 +102,7 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
 
     // TODO: Prevent additional data loss.
     public hydrate(nextSettings: Partial<TSettings> = {}): void {
-        const settings: { [key: string]: unknown } = {
-            ...(this.getDefaultSettings() as {}),
-            ...(nextSettings as {})
-        };
+        const settings = this.calculateSettings(nextSettings) as { [key: string]: unknown };
 
         for (const key of Object.keys(nextSettings)) {
             const value: unknown = settings[key];
@@ -111,10 +115,10 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
         }
 
         this.settings = settings as TSettings;
+
         const event: HydratedEvent = {
             scope: this.scope
         };
-
         this.emit("hydrated", event);
     }
 
@@ -136,18 +140,10 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
             return;
         }
 
-        const nextSettings = {
+        this.settings = this.calculateSettings({
             ...(this.settings as {}),
             [key]: value
-        } as TSettings;
-
-        const validatedSettings = this.validate(nextSettings);
-
-        // We don't want to loose additional settings.
-        this.settings = {
-            ...(nextSettings as {}),
-            ...(validatedSettings as {})
-        } as TSettings;
+        });
 
         const event: UpdatedEvent = {
             scope: this.scope,

@@ -1,10 +1,15 @@
 import { Validate } from "../validator";
+import { Helpers } from "../helpers";
 
 it("string validation", () => {
     const defaultValue = "DEFAULT_VALUE";
     const result: string = Validate(false, defaultValue).isString();
 
     expect(result).toBe(defaultValue);
+});
+it("string validation", () => {
+    const result: string = Validate(null, () => Helpers.randomString(40)).isString(false);
+    expect(typeof result).toBe("string");
 });
 
 it("boolean validation", () => {

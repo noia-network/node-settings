@@ -12,7 +12,7 @@ export function Validate<TDefaultValue = undefined>(value: unknown, defaultValue
 }
 
 function getDefaultValue<TValue = unknown>(defaultValue: DefaultValue<any> | undefined, fallbackValue: TValue): TValue {
-    if (defaultValue != null) {
+    if (defaultValue !== undefined) {
         if (typeof defaultValue === "function") {
             const callback = defaultValue as () => TValue;
             return callback();

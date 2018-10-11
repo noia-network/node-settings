@@ -28,8 +28,12 @@ export namespace Helpers {
             }
 
             if (isPrimitiveOrArrayOfPrimitives(mainValue)) {
-                if (Array.isArray(mainValue) && !primitiveArraysAreEqual(mainValue, otherValue as Primitive[])) {
-                    return false;
+                if (Array.isArray(mainValue)) {
+                    if (!primitiveArraysAreEqual(mainValue, otherValue as Primitive[])) {
+                        return false;
+                    }
+
+                    continue;
                 }
 
                 if (mainValue !== otherValue) {

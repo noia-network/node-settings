@@ -5,6 +5,7 @@ async function main(): Promise<void> {
 
     console.log("Started.");
     const settings = await NodeSettings.init("settings.ini");
+    (global as any).settings = settings;
     settings.on("updated", () => {});
 }
 
