@@ -17,9 +17,9 @@ export class SocketsSettings extends SettingsScopeBase<SocketsSettingsDto> {
 
     protected initScopedSettings(): ScopedSettings<SocketsSettingsDto> {
         return {
-            wrtc: new WebRtcSettings(this.settings.wrtc),
-            http: new HttpSettings(this.settings.http),
-            ws: new WebSocketSettings(this.settings.ws)
+            wrtc: new WebRtcSettings("wrtc", this.settings.wrtc),
+            http: new HttpSettings("http", this.settings.http),
+            ws: new WebSocketSettings("ws", this.settings.ws)
         };
     }
 }
