@@ -43,7 +43,7 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
         } as TSettings;
 
         const validated = this.validate(wholeSettings);
-
+        // We don't want to loose additional settings.
         this.settings = {
             ...(wholeSettings as {}),
             ...(validated as {})
@@ -143,6 +143,7 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
 
         const validatedSettings = this.validate(nextSettings);
 
+        // We don't want to loose additional settings.
         this.settings = {
             ...(nextSettings as {}),
             ...(validatedSettings as {})
