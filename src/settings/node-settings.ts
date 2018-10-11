@@ -119,7 +119,6 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
             data = typeof scopedData === "object" ? scopedData : {};
         }
 
-        console.log(fileContents);
         return data;
     }
 

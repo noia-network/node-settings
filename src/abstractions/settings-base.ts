@@ -46,7 +46,6 @@ export abstract class SettingsBase<TSettings extends SettingsBaseDto> extends Se
         const currentSettings = this.dehydrate();
 
         if (!Helpers.compareObjects(currentSettings, data)) {
-            console.log("Settings file is incomplete. Updating...");
             this.writeSettings(currentSettings);
         }
     };
