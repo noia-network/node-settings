@@ -31,7 +31,7 @@ class Settings extends SettingsScopeBase<NodeSettings> {
 
     protected initScopedSettings(): ScopedSettings<NodeSettings> {
         return {
-            sockets: new SocketsSettings(this.settings.sockets)
+            sockets: new SocketsSettings("sockets", this.settings.sockets)
         };
     }
 }
@@ -43,8 +43,8 @@ class SocketsSettings extends SettingsScopeBase<NodeSettingsSockets> {
 
     protected initScopedSettings(): ScopedSettings<NodeSettingsSockets> {
         return {
-            webrtc: new WebRtcSettings(this.settings.webrtc),
-            ws: new WebSocketSettings(this.settings.ws)
+            webrtc: new WebRtcSettings("webrtc", this.settings.webrtc),
+            ws: new WebSocketSettings("ws", this.settings.ws)
         };
     }
 }
@@ -90,24 +90,23 @@ const SETTINGS_EXAMPLE = {
 };
 
 it("gets settings item by key.", () => {
-    const settings = new Settings(SETTINGS_EXAMPLE);
+    const settings = new Settings("node", SETTINGS_EXAMPLE);
 
     expect(settings.get("version")).toBe(SETTINGS_EXAMPLE.version);
 });
 
 it("gets whole settings object.", () => {
-    const settings = new Settings(SETTINGS_EXAMPLE);
+    const settings = new Settings("node", SETTINGS_EXAMPLE);
 
-    expect(settings.getSettings()).toMatchObject(SETTINGS_EXAMPLE);
+    expect(settings.dehydrate()).toMatchObject(SETTINGS_EXAMPLE);
 });
 
 it("emits an event when item is updated.", async done => {
-    const settings = new Settings(SETTINGS_EXAMPLE);
+    const settings = new Settings("node", SETTINGS_EXAMPLE);
     const key: keyof NodeSettings = "statisticsPath";
     const nextValue = "NEXT_VALUE";
-    settings.on("updated", (keys, value) => {
-        expect(keys[0]).toBe(key);
-        expect(value).toBe(nextValue);
+    settings.on("updated", event => {
+        expect(event.fieldIds[0]).toBe(key);
         done();
     });
 
@@ -115,7 +114,7 @@ it("emits an event when item is updated.", async done => {
 });
 
 it("does NOT emit an event when value is the same.", async done => {
-    const settings = new Settings(SETTINGS_EXAMPLE);
+    const settings = new Settings("node", SETTINGS_EXAMPLE);
     const key: keyof NodeSettings = "statisticsPath";
     const sameValue = settings.get(key);
     const stub = jest.fn();
@@ -130,7 +129,7 @@ it("does NOT emit an event when value is the same.", async done => {
 });
 
 it("hydrates with new settings object.", () => {
-    const settings = new WebRtcSettings({
+    const settings = new WebRtcSettings("webrtc", {
         isEnabled: false,
         port: 1000
     });
@@ -142,5 +141,5 @@ it("hydrates with new settings object.", () => {
 
     expect(settings.get("isEnabled")).toBe(nextIsEnabled);
     expect(settings.get("port")).toBe(settings.getDefaultSettings().port);
-    expect(settings.getSettings()).not.toMatchObject(SETTINGS_EXAMPLE);
+    expect(settings.dehydrate()).not.toMatchObject(SETTINGS_EXAMPLE);
 });
