@@ -1,8 +1,8 @@
-import deepEqual = require("deep-equal");
 import * as chokidar from "chokidar";
 
 import { SettingsScopeBase } from "./settings-scope-base";
 import { DeepPartial } from "../contracts/types-helpers";
+import { Helpers } from "../helpers";
 
 export interface SettingsBaseDto {
     version: string;
@@ -20,12 +20,15 @@ export abstract class SettingsBase<TSettings extends SettingsBaseDto> extends Se
 
     public abstract async readSettings(): Promise<Partial<TSettings>>;
     protected abstract async writeSettingsHandler(settings: TSettings): Promise<void>;
+    private ignoreFileUpdates: boolean = false;
 
     public async writeSettings(settings: TSettings): Promise<void> {
         // We don't listen to file changes while updating file.
         this.settingsWatcher.removeAllListeners();
+        this.ignoreFileUpdates = true;
         await this.writeSettingsHandler(settings);
         this.settingsWatcher.on("change", this.onFileChange);
+        this.ignoreFileUpdates = false;
     }
 
     private async onUpdated(): Promise<void> {
@@ -34,12 +37,17 @@ export abstract class SettingsBase<TSettings extends SettingsBaseDto> extends Se
     }
 
     private onFileChange = async () => {
+        if (this.ignoreFileUpdates) {
+            return;
+        }
+
         const data = await this.readSettings();
         this.hydrate(data);
+        const currentSettings = this.dehydrate();
 
-        if (!deepEqual(data, this.dehydrate(), { strict: true })) {
+        if (!Helpers.compareObjects(currentSettings, data)) {
             console.log("Settings file is incomplete. Updating...");
-            this.writeSettings(this.dehydrate());
+            this.writeSettings(currentSettings);
         }
     };
 }

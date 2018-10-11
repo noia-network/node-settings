@@ -106,11 +106,12 @@ it("emits an event when item is updated.", async done => {
     const key: keyof NodeSettings = "statisticsPath";
     const nextValue = "NEXT_VALUE";
     settings.on("updated", event => {
-        expect(event.fieldIds[0]).toBe(key);
+        expect(event.setting.key).toBe(key);
+        expect(event.value).toBe(nextValue);
         done();
     });
 
-    settings.set(key, nextValue);
+    settings.update(key, nextValue);
 });
 
 it("does NOT emit an event when value is the same.", async done => {
@@ -121,7 +122,7 @@ it("does NOT emit an event when value is the same.", async done => {
 
     settings.on("updated", stub);
 
-    settings.set(key, sameValue);
+    settings.update(key, sameValue);
     setTimeout(() => {
         expect(stub).not.toBeCalled();
         done();

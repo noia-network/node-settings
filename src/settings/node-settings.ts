@@ -69,8 +69,14 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
      */
     public static async init(filePath: string): Promise<NodeSettings> {
         const instance = new NodeSettings({}, filePath);
-        const settings = await instance.readSettings();
-        instance.hydrate(settings);
+        const fileSettings = await instance.readSettings();
+        instance.hydrate(fileSettings);
+
+        const latestSettings = instance.dehydrate();
+
+        if (!Helpers.compareObjects(latestSettings, fileSettings)) {
+            instance.writeSettings(latestSettings);
+        }
 
         return instance;
     }
@@ -108,16 +114,17 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
             data = {};
         } else {
             const resolvedData = ini.parse(fileContents);
-            const scopedData = resolvedData[this.scope];
+            const scopedData = resolvedData[this.scope.key];
 
             data = typeof scopedData === "object" ? scopedData : {};
         }
 
+        console.log(fileContents);
         return data;
     }
 
     protected async writeSettingsHandler(settings: NodeSettingsDto): Promise<void> {
-        const iniData: string = ini.encode({ [this.scope]: settings }, {
+        const iniData: string = ini.encode({ [this.scope.key]: settings }, {
             whitespace: true
         } as any);
 

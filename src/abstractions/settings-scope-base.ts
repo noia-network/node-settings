@@ -1,5 +1,6 @@
 import StrictEventEmitter from "strict-event-emitter-types";
 import { EventEmitter } from "events";
+
 import {
     DeepPartial,
     ExcludePrimitiveAndPrimitiveArrayProperties,
@@ -8,16 +9,13 @@ import {
     PrimitiveAndPrimitiveArrayProperties,
     Primitive
 } from "../contracts/types-helpers";
+import { UpdatedEvent, HydratedEvent, Identifier } from "../contracts/settings-events";
 import { Helpers } from "../helpers";
+import { IdentifierHelpers } from "../identifier-helpers";
 
-export interface UpdatedEvent {
-    scope: string;
-    scopesPath: string[];
-    fieldIds: string[];
-}
-
-export interface SettingsScopeEvents {
+interface SettingsScopeEvents {
     updated: (event: UpdatedEvent) => void;
+    hydrated: (event: HydratedEvent) => void;
     error: Error;
 }
 
@@ -31,8 +29,13 @@ export type DefaultSettings<TSettings> = PrimitiveAndPrimitiveArrayProperties<TS
 const SettingsScopeEmitter: { new (): StrictEventEmitter<EventEmitter, SettingsScopeEvents> } = EventEmitter;
 
 export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter {
-    constructor(protected readonly scope: string, settings: DeepPartial<TSettings>) {
+    constructor(scopeKey: string, settings: DeepPartial<TSettings>) {
         super();
+
+        this.scope = {
+            key: scopeKey,
+            absoluteKey: scopeKey
+        };
 
         this.settings = {
             ...(this.getDefaultSettings() as {}),
@@ -45,10 +48,19 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
             this.scopes[scopeKey].on("updated", event => {
                 const propagatedEvent: UpdatedEvent = {
                     ...event,
-                    scopesPath: [this.scope, ...event.scopesPath]
+                    scope: IdentifierHelpers.addScope(event.scope, this.scope),
+                    setting: IdentifierHelpers.addScope(event.setting, this.scope)
                 };
 
                 this.emit("updated", propagatedEvent);
+            });
+
+            this.scopes[scopeKey].on("hydrated", event => {
+                const propagatedEvent: HydratedEvent = {
+                    scope: IdentifierHelpers.addScope(event.scope, this.scope)
+                };
+
+                this.emit("hydrated", propagatedEvent);
             });
 
             this.scopes[scopeKey].on("error", error => {
@@ -56,6 +68,8 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
             });
         }
     }
+
+    public readonly scope: Identifier;
 
     protected settings: TSettings;
     protected scopes: ScopedSettings<TSettings>;
@@ -72,6 +86,31 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
         return this.scopes;
     }
 
+    // TODO: Prevent additional data loss.
+    public hydrate(nextSettings: Partial<TSettings> = {}): void {
+        const settings: { [key: string]: unknown } = {
+            ...(this.getDefaultSettings() as {}),
+            ...(nextSettings as {})
+        };
+
+        for (const key of Object.keys(nextSettings)) {
+            const value: unknown = settings[key];
+
+            if (!Helpers.isPrimitiveOrArrayOfPrimitives(value)) {
+                if (this.scopes[key] != null) {
+                    this.scopes[key].hydrate(value as {});
+                }
+            }
+        }
+
+        this.settings = settings as TSettings;
+        const event: HydratedEvent = {
+            scope: this.scope
+        };
+
+        this.emit("hydrated", event);
+    }
+
     /**
      * Gets whole settings object.
      */
@@ -85,56 +124,22 @@ export abstract class SettingsScopeBase<TSettings> extends SettingsScopeEmitter 
         return currentSettings as TSettings;
     }
 
-    public set<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey, value: TSettings[TKey]): void {
-        if (this.settings[key] === value) {
+    public update<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey, value: TSettings[TKey]): void {
+        if (this.settings[key] === value && !Helpers.isPrimitiveOrArrayOfPrimitives(value)) {
             return;
         }
 
         this.settings[key] = value;
         const event: UpdatedEvent = {
             scope: this.scope,
-            fieldIds: [key as string],
-            scopesPath: [this.scope]
+            setting: {
+                absoluteKey: this.scope.key + IdentifierHelpers.DELIMITER + key,
+                key: key as string
+            },
+            // Already checked at the beginning.
+            value: (value as unknown) as Primitive | Primitive[]
         };
 
-        this.emit("updated", event);
-    }
-
-    public hydrate(nextSettings: Partial<TSettings> = {}): void {
-        const prevSettings: { [key: string]: unknown } = this.settings;
-        const settings: { [key: string]: unknown } = {
-            ...(this.getDefaultSettings() as {}),
-            ...(nextSettings as {})
-        } as TSettings;
-        // We need to emit an "updated" event, what actually changed after hydration.
-        const changedKeys: string[] = [];
-
-        for (const key of Object.keys(nextSettings)) {
-            const prevValue: unknown = prevSettings[key];
-            const value: unknown = settings[key];
-
-            if (Helpers.isPrimitiveOrArrayOfPrimitives(value)) {
-                if (
-                    prevValue !== value ||
-                    (Array.isArray(value) &&
-                        Helpers.isPrimitiveOrArrayOfPrimitives(value) &&
-                        !Helpers.primitiveArraysAreEqual(value, prevValue as Primitive[]))
-                ) {
-                    changedKeys.push(key);
-                }
-            } else {
-                if (this.scopes[key] != null) {
-                    this.scopes[key].hydrate(value as {});
-                }
-            }
-        }
-
-        this.settings = settings as TSettings;
-        const event: UpdatedEvent = {
-            scope: this.scope,
-            fieldIds: changedKeys,
-            scopesPath: [this.scope]
-        };
         this.emit("updated", event);
     }
 

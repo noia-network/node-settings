@@ -14,6 +14,38 @@ export namespace Helpers {
         return typeof a === "string" || typeof a === "number" || typeof a === "boolean" || a == null || Array.isArray(a);
     }
 
+    export function compareObjects(main: unknown, other: unknown): boolean {
+        if (typeof main !== "object" || typeof other !== "object" || main == null || other == null) {
+            throw new Error(`'main' (${main}) and 'other' (${other}) arguments must be objects.`);
+        }
+
+        for (const key of Object.keys(main)) {
+            const mainValue = (main as { [key: string]: unknown })[key];
+            const otherValue = (other as { [key: string]: unknown })[key];
+
+            if (mainValue != null && otherValue == null) {
+                return false;
+            }
+
+            if (isPrimitiveOrArrayOfPrimitives(mainValue)) {
+                if (Array.isArray(mainValue) && !primitiveArraysAreEqual(mainValue, otherValue as Primitive[])) {
+                    return false;
+                }
+
+                if (mainValue !== otherValue) {
+                    return false;
+                }
+            } else {
+                const result = compareObjects(mainValue, otherValue);
+                if (!result) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     export function primitiveArraysAreEqual(a1: Primitive[], a2: Primitive[]): boolean {
         if (a1.length !== a2.length) {
             return false;

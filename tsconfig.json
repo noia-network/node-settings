@@ -23,5 +23,5 @@
             }
         ]
     },
-    "exclude": ["node_modules", "dist", "@types", "tests", "examples", "tools"]
+    "exclude": ["node_modules", "dist", "@types", "tests", "examples", "tools", "**/*.test.ts"]
 }
