@@ -64,6 +64,7 @@ function isNumber<TDefaultValue>(
     value: unknown,
     defaultValue?: DefaultValue<TDefaultValue>
 ): (min?: number, max?: number) => number | ExceptUndefined<TDefaultValue> {
+    value = Number(value);
     const FALLBACK_VALUE: number = 0;
 
     return (min?: number, max?: number) => {
