@@ -4,6 +4,8 @@ import * as os from "os";
 
 import { SettingsBase, SettingsBaseDto } from "../abstractions/settings-base";
 import { ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { DeepPartial } from "../contracts/types-helpers";
+import { Validate } from "../validator";
 
 import { Helpers } from "../helpers";
 
@@ -14,8 +16,7 @@ import { StorageSettings, StorageSettingsDto } from "./storage-settings";
 import { WhitelistSettings, WhitelistSettingsDto } from "./whitelist-settings";
 import { SocketsSettings, SocketsSettingsDto } from "./sockets-settings";
 import { BlockchainSettings, BlockchainSettingsDto } from "./blockchain-settings";
-import { DeepPartial } from "../contracts/types-helpers";
-import { Validate } from "../validator";
+import { SslSettings, SslSettingsDto } from "./ssl-settings";
 
 export interface NodeSettingsDto extends SettingsBaseDto {
     statisticsPath: string | null;
@@ -56,6 +57,7 @@ export interface NodeSettingsDto extends SettingsBaseDto {
     storage: StorageSettingsDto;
     whitelist: WhitelistSettingsDto;
     sockets: SocketsSettingsDto;
+    ssl: SslSettingsDto;
 }
 
 export class NodeSettings extends SettingsBase<NodeSettingsDto> {
@@ -118,7 +120,8 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
             wallet: new WalletSettings("wallet", this.settings.wallet),
             storage: new StorageSettings("storage", this.settings.storage),
             whitelist: new WhitelistSettings("whitelist", this.settings.whitelist),
-            sockets: new SocketsSettings("sockets", this.settings.sockets)
+            sockets: new SocketsSettings("sockets", this.settings.sockets),
+            ssl: new SslSettings("ssl", this.settings.ssl)
         };
     }
 
