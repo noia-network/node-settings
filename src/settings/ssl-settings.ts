@@ -1,10 +1,11 @@
 import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { Validate } from "../validator";
 
 export interface SslSettingsDto {
     isEnabled: boolean;
-    crtBundlePath: string;
-    crtPath: string;
-    privateKeyPath: string;
+    crtBundlePath: string | null;
+    crtPath: string | null;
+    privateKeyPath: string | null;
 }
 
 export class SslSettings extends SettingsScopeBase<SslSettingsDto> {
@@ -19,5 +20,14 @@ export class SslSettings extends SettingsScopeBase<SslSettingsDto> {
 
     protected initScopedSettings(): ScopedSettings<SslSettingsDto> {
         return {};
+    }
+
+    public validate(settings: ScopeSettings<SslSettingsDto>): ScopeSettings<SslSettingsDto> {
+        return {
+            isEnabled: Validate(settings.isEnabled).isBoolean(),
+            crtBundlePath: Validate(settings.crtBundlePath, null).isString(false),
+            crtPath: Validate(settings.crtPath, null).isString(false),
+            privateKeyPath: Validate(settings.privateKeyPath, null).isString(false)
+        };
     }
 }

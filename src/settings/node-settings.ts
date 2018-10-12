@@ -98,20 +98,17 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
     }
 
     public validate(settings: ScopeSettings<NodeSettingsDto>): ScopeSettings<NodeSettingsDto> {
-        const nodeId = Validate(settings.nodeId, () => Helpers.randomString(40)).isString(false);
-        const result = {
+        return {
             version: Validate(settings.version, this.version).isString(false),
             isHeadless: Validate(settings.isHeadless).isBoolean(),
             statisticsPath: Validate(settings.statisticsPath, null).isString(false),
             domain: Validate(settings.domain, null).isString(false),
             masterAddress: Validate(settings.masterAddress, null).isString(false),
-            nodeId: nodeId,
+            nodeId: Validate(settings.nodeId, () => Helpers.randomString(40)).isString(false),
             natPmp: Validate(settings.natPmp).isBoolean(),
             publicIp: Validate(settings.masterAddress, null).isString(false),
             userDataPath: Validate(settings.userDataPath, null).isString(false)
         };
-
-        return result;
     }
 
     protected initScopedSettings(): ScopedSettings<NodeSettingsDto> {

@@ -1,4 +1,4 @@
-import { ExceptUndefined } from "./contracts/types-helpers";
+import { ExceptUndefined, Primitive } from "./contracts/types-helpers";
 
 export type DefaultValue<TValue = any> = TValue | (() => TValue);
 
@@ -7,7 +7,9 @@ export function Validate<TDefaultValue = undefined>(value: unknown, defaultValue
     return {
         isBoolean: isBoolean<TDefaultValue>(value, defaultValue),
         isString: isString<TDefaultValue>(value, defaultValue),
-        isNumber: isNumber<TDefaultValue>(value, defaultValue)
+        isNumber: isNumber<TDefaultValue>(value, defaultValue),
+        isNetworkPort: isNetworkPort<TDefaultValue>(value, defaultValue),
+        isPrimitiveArray: isPrimitiveArray<TDefaultValue>(value, defaultValue)
     };
 }
 
@@ -74,6 +76,40 @@ function isNumber<TDefaultValue>(
         }
 
         return getDefaultValue<number>(defaultValue, FALLBACK_VALUE);
+    };
+}
+
+function isNetworkPort<TDefaultValue>(
+    value: unknown,
+    defaultValue?: DefaultValue<TDefaultValue>
+): () => number | ExceptUndefined<TDefaultValue> {
+    const FALLBACK_VALUE: number = 0;
+
+    return () => {
+        if (typeof value === "number") {
+            if (value < 0 || value > 65535 || isNaN(value)) {
+                return getDefaultValue<number>(defaultValue, FALLBACK_VALUE);
+            }
+
+            return value;
+        }
+
+        return getDefaultValue<number>(defaultValue, FALLBACK_VALUE);
+    };
+}
+
+function isPrimitiveArray<TDefaultValue>(
+    value: unknown,
+    defaultValue?: DefaultValue<TDefaultValue>
+): () => Primitive[] | ExceptUndefined<TDefaultValue> {
+    const FALLBACK_VALUE: Primitive[] = [];
+
+    return () => {
+        if (Array.isArray(value)) {
+            return value;
+        }
+
+        return getDefaultValue<Primitive[]>(defaultValue, FALLBACK_VALUE);
     };
 }
 
