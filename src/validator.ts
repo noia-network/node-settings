@@ -1,5 +1,6 @@
 import { ExceptUndefined, Primitive } from "./contracts/types-helpers";
 
+// tslint:disable-next-line:no-any
 export type DefaultValue<TValue = any> = TValue | (() => TValue);
 
 // tslint:disable-next-line:typedef
@@ -13,6 +14,7 @@ export function Validate<TDefaultValue = undefined>(value: unknown, defaultValue
     };
 }
 
+// tslint:disable-next-line:no-any
 function getDefaultValue<TValue = unknown>(defaultValue: DefaultValue<any> | undefined, fallbackValue: TValue): TValue {
     if (defaultValue !== undefined) {
         if (typeof defaultValue === "function") {

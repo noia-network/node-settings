@@ -1,3 +1,4 @@
+// tslint:disable
 import { NodeSettings } from "./settings/node-settings";
 
 async function main(): Promise<void> {

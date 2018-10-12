@@ -20,8 +20,8 @@ interface SettingsScopeEvents {
 }
 
 export type ScopedSettings<TValue> = {
-    [T in keyof ExcludePrimitiveAndPrimitiveArrayProperties<TValue>]: SettingsScopeBase<
-        ExcludePrimitiveAndPrimitiveArrayProperties<TValue>[T]
+    [TKey in keyof ExcludePrimitiveAndPrimitiveArrayProperties<TValue>]: SettingsScopeBase<
+        ExcludePrimitiveAndPrimitiveArrayProperties<TValue>[TKey]
     >
 };
 export type ScopeSettings<TSettings> = PrimitiveAndPrimitiveArrayProperties<TSettings>;
@@ -41,8 +41,8 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
 
         this.scopes = this.initScopedSettings();
         // Re-emit to higher levels.
-        for (const scopeKey of Object.keys(this.scopes)) {
-            this.scopes[scopeKey].on("updated", event => {
+        for (const scopeListKey of Object.keys(this.scopes)) {
+            this.scopes[scopeListKey].on("updated", event => {
                 const propagatedEvent: UpdatedEvent = {
                     ...event,
                     scope: IdentifierHelpers.addScope(event.scope, this.scope),
@@ -52,7 +52,7 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
                 this.emit("updated", propagatedEvent);
             });
 
-            this.scopes[scopeKey].on("hydrated", event => {
+            this.scopes[scopeListKey].on("hydrated", event => {
                 const propagatedEvent: HydratedEvent = {
                     scope: IdentifierHelpers.addScope(event.scope, this.scope)
                 };
@@ -60,7 +60,7 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
                 this.emit("hydrated", propagatedEvent);
             });
 
-            this.scopes[scopeKey].on("error", error => {
+            this.scopes[scopeListKey].on("error", error => {
                 this.emit("error", error);
             });
         }

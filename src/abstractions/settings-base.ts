@@ -1,4 +1,5 @@
 import * as chokidar from "chokidar";
+// tslint:disable-next-line:no-require-imports
 import debounce = require("lodash.debounce");
 
 import { SettingsScopeBase } from "./settings-scope-base";
@@ -35,8 +36,7 @@ export abstract class SettingsBase<TSettings extends SettingsBaseDto> extends Se
         await this.writeSettings(nextSettingsState);
     }
 
-    private onFileChange = debounce(async () => {
-        console.log("ON file changed.");
+    private onFileChange: () => void = debounce(async () => {
         if (this.isReadingFile) {
             return;
         }
@@ -49,8 +49,6 @@ export abstract class SettingsBase<TSettings extends SettingsBaseDto> extends Se
 
             const updatedSettings = this.dehydrate();
             if (!Helpers.compareObjects(updatedSettings, data)) {
-                console.log("Objects are not identical.");
-                console.log(updatedSettings, data);
                 this.writeSettings(updatedSettings);
             }
         } catch (error) {

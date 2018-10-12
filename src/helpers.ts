@@ -10,7 +10,7 @@ export namespace Helpers {
         return text;
     }
 
-    export function isPrimitiveOrArrayOfPrimitives(a: unknown): a is Primitive | Array<Primitive> {
+    export function isPrimitiveOrArrayOfPrimitives(a: unknown): a is Primitive | Primitive[] {
         return typeof a === "string" || typeof a === "number" || typeof a === "boolean" || a == null || Array.isArray(a);
     }
 

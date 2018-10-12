@@ -144,6 +144,7 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
     protected async writeSettingsHandler(settings: NodeSettingsDto): Promise<void> {
         const iniData: string = ini.encode({ [this.scope.key]: settings }, {
             whitespace: true
+            // tslint:disable-next-line:no-any
         } as any);
 
         const header: string = "# NOIA Node settings file." + os.EOL;
