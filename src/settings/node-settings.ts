@@ -1,6 +1,9 @@
 import * as fs from "fs-extra";
 import * as ini from "ini";
+// tslint:disable-next-line:no-require-imports
+const AppDataFolder = require("app-data-folder");
 import * as os from "os";
+import * as path from "path";
 
 import { SettingsBase, SettingsBaseDto } from "../abstractions/settings-base";
 import { ScopeSettings, ScopesListSettings } from "../abstractions/settings-scope-base";
@@ -11,7 +14,6 @@ import { Helpers } from "../helpers";
 
 // Scopes
 import { ControllerSettings, ControllerSettingsDto } from "./controller-settings";
-import { WalletSettings, WalletSettingsDto } from "./wallet-settings";
 import { StorageSettings, StorageSettingsDto } from "./storage-settings";
 import { WhitelistSettings, WhitelistSettingsDto } from "./whitelist-settings";
 import { SocketsSettings, SocketsSettingsDto } from "./sockets-settings";
@@ -20,10 +22,6 @@ import { SslSettings, SslSettingsDto } from "./ssl-settings";
 
 export interface NodeSettingsDto extends SettingsBaseDto {
     statisticsPath: string | null;
-    /**
-     * False if node GUI.
-     */
-    isHeadless: boolean;
     /**
      * Domain SSL is valid for.
      */
@@ -40,7 +38,7 @@ export interface NodeSettingsDto extends SettingsBaseDto {
      * Node identifier if skipping blockchain.
      * TODO: Implement better generating.
      */
-    nodeId: string | null;
+    nodeId: string;
     /**
      * Public IP that master must use. If empty, master must resolve IP by itself.
      */
@@ -48,12 +46,11 @@ export interface NodeSettingsDto extends SettingsBaseDto {
     /**
      * Path to user user data folder. If specified, default settings.json and/or statistics.json will be saved to user data folder.
      */
-    userDataPath: string | null;
+    userDataPath: string;
 
     // SCOPES
     controller: ControllerSettingsDto;
     blockchain: BlockchainSettingsDto;
-    wallet: WalletSettingsDto;
     storage: StorageSettingsDto;
     whitelist: WhitelistSettingsDto;
     sockets: SocketsSettingsDto;
@@ -86,30 +83,33 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
     private readonly version: string = "1.0.0";
 
     public getDefaultSettings(): ScopeSettings<NodeSettingsDto> {
+        const userDataPath: string = AppDataFolder("noia-node");
+        const statisticsPath: string = path.resolve(userDataPath, "statistics.json");
+
         return {
             version: this.version,
-            isHeadless: false,
-            statisticsPath: null,
+            userDataPath: userDataPath,
+            statisticsPath: statisticsPath,
             domain: null,
             masterAddress: null,
-            nodeId: null,
+            nodeId: "",
             natPmp: false,
-            publicIp: null,
-            userDataPath: null
+            publicIp: null
         };
     }
 
     public validate(settings: ScopeSettings<NodeSettingsDto>): ScopeSettings<NodeSettingsDto> {
+        const defaultSettings = this.getDefaultSettings();
+
         return {
             version: Validate(settings.version, this.version).isString(false),
-            isHeadless: Validate(settings.isHeadless).isBoolean(),
-            statisticsPath: Validate(settings.statisticsPath, null).isString(false),
+            statisticsPath: Validate(settings.statisticsPath, defaultSettings.statisticsPath).isString(false),
             domain: Validate(settings.domain, null).isString(false),
             masterAddress: Validate(settings.masterAddress, null).isString(false),
             nodeId: Validate(settings.nodeId, () => Helpers.randomString(40)).isString(false),
             natPmp: Validate(settings.natPmp).isBoolean(),
             publicIp: Validate(settings.masterAddress, null).isString(false),
-            userDataPath: Validate(settings.userDataPath, null).isString(false)
+            userDataPath: Validate(settings.userDataPath, defaultSettings.userDataPath).isString(false)
         };
     }
 
@@ -117,7 +117,6 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
         return {
             controller: new ControllerSettings("controller", this.settings.controller),
             blockchain: new BlockchainSettings("blockchain", this.settings.blockchain),
-            wallet: new WalletSettings("wallet", this.settings.wallet),
             storage: new StorageSettings("storage", this.settings.storage),
             whitelist: new WhitelistSettings("whitelist", this.settings.whitelist),
             sockets: new SocketsSettings("sockets", this.settings.sockets),

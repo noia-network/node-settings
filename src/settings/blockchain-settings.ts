@@ -13,9 +13,8 @@ export interface BlockchainSettingsDto {
     doCreateClient: boolean;
     lastBlockPosition: string | null;
     workOrder: string | null;
-    address: string | null;
-    mnemonic: string | null;
-    providerUrl: string | null;
+    walletAddress: string | null;
+    walletProviderUrl: string | null;
 }
 
 export class BlockchainSettings extends SettingsScopeBase<BlockchainSettingsDto> {
@@ -24,10 +23,9 @@ export class BlockchainSettings extends SettingsScopeBase<BlockchainSettingsDto>
             isEnabled: false,
             doCreateClient: false,
             client: "",
-            address: "",
+            walletAddress: "",
             lastBlockPosition: "",
-            mnemonic: "",
-            providerUrl: "",
+            walletProviderUrl: "",
             workOrder: ""
         };
     }
@@ -43,9 +41,8 @@ export class BlockchainSettings extends SettingsScopeBase<BlockchainSettingsDto>
             doCreateClient: Validate(settings.doCreateClient).isBoolean(),
             lastBlockPosition: Validate(settings.lastBlockPosition, null).isString(false),
             workOrder: Validate(settings.workOrder, null).isString(false),
-            address: Validate(settings.address, null).isString(false),
-            mnemonic: Validate(settings.mnemonic, null).isString(false),
-            providerUrl: Validate(settings.providerUrl, null).isString(false)
+            walletAddress: Validate(settings.walletAddress, null).isString(false),
+            walletProviderUrl: Validate(settings.walletProviderUrl, null).isString(false)
         };
     }
 }

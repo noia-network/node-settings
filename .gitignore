@@ -3,3 +3,4 @@ app-builds
 dist
 .DS_Store
 coverage
+settings.ini
