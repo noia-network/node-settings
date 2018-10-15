@@ -1,8 +1,8 @@
 {
     "name": "@noia-network/node-settings",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
+    "version": "0.1.0-alpha",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "scripts": {
         "pretest": "tsc -p . --noEmit",
         "test": "npm run tslint",
@@ -12,7 +12,6 @@
         "test:watch": "jest --watchAll --coverage false",
         "tslint": "tslint --project . --config ./tslint.json && echo Successfully passed tslint test."
     },
-    "author": "",
     "devDependencies": {
         "jest": "^23.6.0",
         "ts-jest": "^23.10.4",
@@ -36,6 +35,10 @@
         "tslint": "^5.11.0",
         "tslint-language-service": "^0.9.9"
     },
+    "files": [
+        "dist",
+        "**/*.md"
+    ],
     "jest": {
         "collectCoverage": true,
         "transform": {
