@@ -1,4 +1,4 @@
-import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopesListSettings } from "../abstractions/settings-scope-base";
 import { Validate } from "../validator";
 
 export interface WalletSettingsDto {
@@ -19,7 +19,7 @@ export class WalletSettings extends SettingsScopeBase<WalletSettingsDto> {
         };
     }
 
-    protected initScopedSettings(): ScopedSettings<WalletSettingsDto> {
+    protected initScopedSettings(): ScopesListSettings<WalletSettingsDto> {
         return {};
     }
 

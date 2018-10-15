@@ -19,7 +19,7 @@ interface SettingsScopeEvents {
     error: Error;
 }
 
-export type ScopedSettings<TValue> = {
+export type ScopesListSettings<TValue> = {
     [TKey in keyof ExcludePrimitiveAndPrimitiveArrayProperties<TValue>]: SettingsScopeBase<
         ExcludePrimitiveAndPrimitiveArrayProperties<TValue>[TKey]
     >
@@ -69,7 +69,7 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
     public readonly scope: Identifier;
 
     protected settings: TSettings;
-    protected scopes: ScopedSettings<TSettings>;
+    protected scopes: ScopesListSettings<TSettings>;
 
     protected calculateSettings(settings: DeepPartial<TSettings>): TSettings {
         const wholeSettings = {
@@ -96,7 +96,7 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
         return this.scopes[key];
     }
 
-    public getAllScopes(): ScopedSettings<TSettings> {
+    public getAllScopes(): ScopesListSettings<TSettings> {
         return this.scopes;
     }
 
@@ -158,7 +158,7 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
         this.emit("updated", event);
     }
 
-    protected abstract initScopedSettings(): ScopedSettings<TSettings>;
+    protected abstract initScopedSettings(): ScopesListSettings<TSettings>;
     public abstract getDefaultSettings(): ScopeSettings<TSettings>;
 
     protected validate(settings: ScopeSettings<TSettings>): ScopeSettings<TSettings> {

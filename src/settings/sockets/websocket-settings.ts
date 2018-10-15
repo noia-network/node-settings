@@ -1,4 +1,4 @@
-import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopesListSettings } from "../../abstractions/settings-scope-base";
 import { Validate } from "../../validator";
 
 export interface WebSocketSettingsDto {
@@ -16,7 +16,7 @@ export class WebSocketSettings extends SettingsScopeBase<WebSocketSettingsDto> {
         };
     }
 
-    protected initScopedSettings(): ScopedSettings<WebSocketSettingsDto> {
+    protected initScopedSettings(): ScopesListSettings<WebSocketSettingsDto> {
         return {};
     }
 

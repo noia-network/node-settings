@@ -3,7 +3,7 @@ import * as ini from "ini";
 import * as os from "os";
 
 import { SettingsBase, SettingsBaseDto } from "../abstractions/settings-base";
-import { ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { ScopeSettings, ScopesListSettings } from "../abstractions/settings-scope-base";
 import { DeepPartial } from "../contracts/types-helpers";
 import { Validate } from "../validator";
 
@@ -113,7 +113,7 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
         };
     }
 
-    protected initScopedSettings(): ScopedSettings<NodeSettingsDto> {
+    protected initScopedSettings(): ScopesListSettings<NodeSettingsDto> {
         return {
             controller: new ControllerSettings("controller", this.settings.controller),
             blockchain: new BlockchainSettings("blockchain", this.settings.blockchain),

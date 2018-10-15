@@ -1,4 +1,4 @@
-import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopesListSettings } from "../abstractions/settings-scope-base";
 import { Validate } from "../validator";
 
 export interface BlockchainSettingsDto {
@@ -32,7 +32,7 @@ export class BlockchainSettings extends SettingsScopeBase<BlockchainSettingsDto>
         };
     }
 
-    protected initScopedSettings(): ScopedSettings<BlockchainSettingsDto> {
+    protected initScopedSettings(): ScopesListSettings<BlockchainSettingsDto> {
         return {};
     }
 

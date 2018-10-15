@@ -1,4 +1,4 @@
-import { SettingsScopeBase, ScopedSettings, DefaultSettings } from "../settings-scope-base";
+import { SettingsScopeBase, ScopesListSettings, ScopeSettings } from "../settings-scope-base";
 
 interface NodeSettings {
     version: string;
@@ -22,14 +22,14 @@ interface NodeSettingsSocketsWebSocket {
 }
 
 class Settings extends SettingsScopeBase<NodeSettings> {
-    public getDefaultSettings(): DefaultSettings<NodeSettings> {
+    public getDefaultSettings(): ScopeSettings<NodeSettings> {
         return {
             version: "0.0.0",
             statisticsPath: ""
         };
     }
 
-    protected initScopedSettings(): ScopedSettings<NodeSettings> {
+    protected initScopedSettings(): ScopesListSettings<NodeSettings> {
         return {
             sockets: new SocketsSettings("sockets", this.settings.sockets)
         };
@@ -37,11 +37,11 @@ class Settings extends SettingsScopeBase<NodeSettings> {
 }
 
 class SocketsSettings extends SettingsScopeBase<NodeSettingsSockets> {
-    public getDefaultSettings(): DefaultSettings<NodeSettingsSockets> {
+    public getDefaultSettings(): ScopeSettings<NodeSettingsSockets> {
         return {};
     }
 
-    protected initScopedSettings(): ScopedSettings<NodeSettingsSockets> {
+    protected initScopedSettings(): ScopesListSettings<NodeSettingsSockets> {
         return {
             webrtc: new WebRtcSettings("webrtc", this.settings.webrtc),
             ws: new WebSocketSettings("ws", this.settings.ws)
@@ -50,26 +50,26 @@ class SocketsSettings extends SettingsScopeBase<NodeSettingsSockets> {
 }
 
 class WebRtcSettings extends SettingsScopeBase<NodeSettingsSocketsWebRtc> {
-    public getDefaultSettings(): DefaultSettings<NodeSettingsSocketsWebRtc> {
+    public getDefaultSettings(): ScopeSettings<NodeSettingsSocketsWebRtc> {
         return {
             isEnabled: false,
             port: 0
         };
     }
 
-    protected initScopedSettings(): ScopedSettings<NodeSettingsSocketsWebRtc> {
+    protected initScopedSettings(): ScopesListSettings<NodeSettingsSocketsWebRtc> {
         return {};
     }
 }
 class WebSocketSettings extends SettingsScopeBase<NodeSettingsSocketsWebSocket> {
-    public getDefaultSettings(): DefaultSettings<NodeSettingsSocketsWebSocket> {
+    public getDefaultSettings(): ScopeSettings<NodeSettingsSocketsWebSocket> {
         return {
             isEnabled: false,
             port: 0
         };
     }
 
-    protected initScopedSettings(): ScopedSettings<NodeSettingsSocketsWebSocket> {
+    protected initScopedSettings(): ScopesListSettings<NodeSettingsSocketsWebSocket> {
         return {};
     }
 }

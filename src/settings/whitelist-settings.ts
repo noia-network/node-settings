@@ -1,4 +1,4 @@
-import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopesListSettings } from "../abstractions/settings-scope-base";
 import { Validate } from "../validator";
 
 export interface WhitelistSettingsDto {
@@ -12,7 +12,7 @@ export class WhitelistSettings extends SettingsScopeBase<WhitelistSettingsDto> {
         };
     }
 
-    protected initScopedSettings(): ScopedSettings<WhitelistSettingsDto> {
+    protected initScopedSettings(): ScopesListSettings<WhitelistSettingsDto> {
         return {};
     }
 

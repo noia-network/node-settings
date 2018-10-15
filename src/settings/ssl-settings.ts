@@ -1,4 +1,4 @@
-import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopesListSettings } from "../abstractions/settings-scope-base";
 import { Validate } from "../validator";
 
 export interface SslSettingsDto {
@@ -18,7 +18,7 @@ export class SslSettings extends SettingsScopeBase<SslSettingsDto> {
         };
     }
 
-    protected initScopedSettings(): ScopedSettings<SslSettingsDto> {
+    protected initScopedSettings(): ScopesListSettings<SslSettingsDto> {
         return {};
     }
 

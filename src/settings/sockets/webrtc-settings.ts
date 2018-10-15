@@ -1,4 +1,4 @@
-import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopesListSettings } from "../../abstractions/settings-scope-base";
 import { Validate } from "../../validator";
 
 export interface WebRtcSettingsDto {
@@ -20,7 +20,7 @@ export class WebRtcSettings extends SettingsScopeBase<WebRtcSettingsDto> {
         };
     }
 
-    protected initScopedSettings(): ScopedSettings<WebRtcSettingsDto> {
+    protected initScopedSettings(): ScopesListSettings<WebRtcSettingsDto> {
         return {};
     }
 

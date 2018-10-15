@@ -1,4 +1,4 @@
-import { SettingsScopeBase, ScopeSettings, ScopedSettings } from "../abstractions/settings-scope-base";
+import { SettingsScopeBase, ScopeSettings, ScopesListSettings } from "../abstractions/settings-scope-base";
 
 import { WebRtcSettings, WebRtcSettingsDto } from "./sockets/webrtc-settings";
 import { HttpSettings, HttpSettingsDto } from "./sockets/http-settings";
@@ -15,7 +15,7 @@ export class SocketsSettings extends SettingsScopeBase<SocketsSettingsDto> {
         return {};
     }
 
-    protected initScopedSettings(): ScopedSettings<SocketsSettingsDto> {
+    protected initScopedSettings(): ScopesListSettings<SocketsSettingsDto> {
         return {
             wrtc: new WebRtcSettings("wrtc", this.settings.wrtc),
             http: new HttpSettings("http", this.settings.http),
