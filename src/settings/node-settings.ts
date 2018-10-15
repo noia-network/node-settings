@@ -126,6 +126,7 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
     }
 
     public async readSettings(): Promise<Partial<NodeSettingsDto>> {
+        await fs.ensureFile(this.filePath);
         const fileContents = await fs.readFile(this.filePath, { encoding: "utf8" });
 
         let data: Partial<NodeSettingsDto>;

@@ -158,6 +158,30 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
         this.emit("updated", event);
     }
 
+    /**
+     * Resets to default value.
+     */
+    public reset<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey): void {
+        const value = this.getDefaultSettings()[key];
+
+        this.settings = this.calculateSettings({
+            ...(this.settings as {}),
+            [key]: value
+        });
+
+        const event: UpdatedEvent = {
+            scope: this.scope,
+            setting: {
+                absoluteKey: this.scope.key + IdentifierHelpers.DELIMITER + key,
+                key: key as string
+            },
+            // Default value MUST be valid.
+            value: (value as unknown) as Primitive | Primitive[]
+        };
+
+        this.emit("updated", event);
+    }
+
     protected abstract initScopedSettings(): ScopesListSettings<TSettings>;
     public abstract getDefaultSettings(): ScopeSettings<TSettings>;
 
