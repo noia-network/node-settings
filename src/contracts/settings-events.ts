@@ -9,6 +9,7 @@ export interface UpdatedEvent {
     scope: Identifier;
     setting: Identifier;
     value: Primitive | Primitive[];
+    prevValue: Primitive | Primitive[];
 }
 
 export interface HydratedEvent {

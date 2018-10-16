@@ -140,6 +140,7 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
             return;
         }
 
+        const prevValue = this.settings[key];
         this.settings = this.calculateSettings({
             ...(this.settings as {}),
             [key]: value
@@ -151,6 +152,7 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
                 absoluteKey: this.scope.key + IdentifierHelpers.DELIMITER + key,
                 key: key as string
             },
+            prevValue: (prevValue as unknown) as Primitive | Primitive[],
             // Already checked at the beginning.
             value: (value as unknown) as Primitive | Primitive[]
         };
@@ -162,6 +164,7 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
      * Resets to default value.
      */
     public reset<TKey extends PrimitiveAndPrimitiveArrayKeys<TSettings>>(key: TKey): void {
+        const prevValue = this.settings[key];
         const value = this.getDefaultSettings()[key];
 
         this.settings = this.calculateSettings({
@@ -175,6 +178,7 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
                 absoluteKey: this.scope.key + IdentifierHelpers.DELIMITER + key,
                 key: key as string
             },
+            prevValue: (prevValue as unknown) as Primitive | Primitive[],
             // Default value MUST be valid.
             value: (value as unknown) as Primitive | Primitive[]
         };

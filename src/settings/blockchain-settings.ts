@@ -1,3 +1,5 @@
+import { generateMnemonic } from "bip39";
+
 import { SettingsScopeBase, ScopeSettings, ScopesListSettings } from "../abstractions/settings-scope-base";
 import { Validate } from "../validator";
 
@@ -9,24 +11,26 @@ export interface BlockchainSettingsDto {
     /**
      * Node client address.
      */
-    client: string | null;
+    clientAddress: string | null;
     doCreateClient: boolean;
     lastBlockPosition: string | null;
-    workOrder: string | null;
-    walletAddress: string | null;
+    workOrderAddress: string | null;
+    airdropAddress: string | null;
+    walletMnemonic: string;
     walletProviderUrl: string | null;
 }
 
 export class BlockchainSettings extends SettingsScopeBase<BlockchainSettingsDto> {
     public getDefaultSettings(): ScopeSettings<BlockchainSettingsDto> {
         return {
-            isEnabled: false,
+            isEnabled: true,
             doCreateClient: false,
-            client: "",
-            walletAddress: "",
+            clientAddress: "",
+            airdropAddress: "",
+            walletMnemonic: "",
             lastBlockPosition: "",
             walletProviderUrl: "",
-            workOrder: ""
+            workOrderAddress: ""
         };
     }
 
@@ -35,13 +39,16 @@ export class BlockchainSettings extends SettingsScopeBase<BlockchainSettingsDto>
     }
 
     public validate(settings: ScopeSettings<BlockchainSettingsDto>): ScopeSettings<BlockchainSettingsDto> {
+        const defaultValue = this.getDefaultSettings();
+
         return {
-            isEnabled: Validate(settings.isEnabled).isBoolean(),
-            client: Validate(settings.client, null).isString(false),
-            doCreateClient: Validate(settings.doCreateClient).isBoolean(),
+            isEnabled: Validate(settings.isEnabled, defaultValue.isEnabled).isBoolean(),
+            doCreateClient: Validate(settings.doCreateClient, defaultValue.doCreateClient).isBoolean(),
+            clientAddress: Validate(settings.clientAddress, null).isString(false),
             lastBlockPosition: Validate(settings.lastBlockPosition, null).isString(false),
-            workOrder: Validate(settings.workOrder, null).isString(false),
-            walletAddress: Validate(settings.walletAddress, null).isString(false),
+            workOrderAddress: Validate(settings.workOrderAddress, null).isString(false),
+            airdropAddress: Validate(settings.airdropAddress, null).isString(false),
+            walletMnemonic: Validate(settings.walletMnemonic, () => generateMnemonic()).isString(false),
             walletProviderUrl: Validate(settings.walletProviderUrl, null).isString(false)
         };
     }

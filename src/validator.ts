@@ -10,6 +10,7 @@ export function Validate<TDefaultValue = undefined>(value: unknown, defaultValue
         isString: isString<TDefaultValue>(value, defaultValue),
         isNumber: isNumber<TDefaultValue>(value, defaultValue),
         isNetworkPort: isNetworkPort<TDefaultValue>(value, defaultValue),
+        isIpv4: isIpv4<TDefaultValue>(value, defaultValue),
         isPrimitiveArray: isPrimitiveArray<TDefaultValue>(value, defaultValue)
     };
 }
@@ -87,17 +88,16 @@ function isNetworkPort<TDefaultValue>(
     defaultValue?: DefaultValue<TDefaultValue>
 ): () => number | ExceptUndefined<TDefaultValue> {
     const FALLBACK_VALUE: number = 0;
+    const resolvedDefaultValue = getDefaultValue<number>(defaultValue, FALLBACK_VALUE);
+
+    const resolvedValue = Number(value);
 
     return () => {
-        if (typeof value === "number") {
-            if (value < 0 || value > 65535 || isNaN(value)) {
-                return getDefaultValue<number>(defaultValue, FALLBACK_VALUE);
-            }
-
-            return value;
+        if (isNaN(resolvedValue) || resolvedValue < 0 || resolvedValue > 65535) {
+            return resolvedDefaultValue;
         }
 
-        return getDefaultValue<number>(defaultValue, FALLBACK_VALUE);
+        return resolvedValue;
     };
 }
 
@@ -113,6 +113,24 @@ function isPrimitiveArray<TDefaultValue>(
         }
 
         return getDefaultValue<Primitive[]>(defaultValue, FALLBACK_VALUE);
+    };
+}
+
+function isIpv4<TDefaultValue>(value: unknown, defaultValue?: DefaultValue<TDefaultValue>): () => string | ExceptUndefined<TDefaultValue> {
+    const FALLBACK_VALUE: Primitive = "0.0.0.0";
+    const resolvedDefaultValue = getDefaultValue<string>(defaultValue, FALLBACK_VALUE);
+
+    return () => {
+        if (typeof value !== "string") {
+            return resolvedDefaultValue;
+        }
+
+        const result = value.match(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/);
+        if (result == null || result.length === 0) {
+            return resolvedDefaultValue;
+        }
+
+        return result[0];
     };
 }
 
