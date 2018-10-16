@@ -3,7 +3,7 @@ import { Validate } from "../../validator";
 
 export interface HttpSettingsDto {
     isEnabled: boolean;
-    ip: string | null;
+    ip: string;
     port: number;
 }
 
@@ -11,8 +11,8 @@ export class HttpSettings extends SettingsScopeBase<HttpSettingsDto> {
     public getDefaultSettings(): ScopeSettings<HttpSettingsDto> {
         return {
             isEnabled: false,
-            ip: "",
-            port: 0
+            ip: "0.0.0.0",
+            port: 6767
         };
     }
 
@@ -21,10 +21,12 @@ export class HttpSettings extends SettingsScopeBase<HttpSettingsDto> {
     }
 
     public validate(settings: ScopeSettings<HttpSettingsDto>): ScopeSettings<HttpSettingsDto> {
+        const defaultValue = this.getDefaultSettings();
+
         return {
             isEnabled: Validate(settings.isEnabled).isBoolean(),
-            ip: Validate(settings.ip, null).isString(false),
-            port: Validate(settings.port).isNetworkPort()
+            ip: Validate(settings.ip, defaultValue.ip).isIpv4(),
+            port: Validate(settings.port, defaultValue.port).isNetworkPort()
         };
     }
 }

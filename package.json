@@ -1,6 +1,6 @@
 {
     "name": "@noia-network/node-settings",
-    "version": "0.1.0-alpha.3",
+    "version": "0.1.0-alpha.4",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
@@ -20,6 +20,7 @@
         "typescript": "^3.1.1"
     },
     "dependencies": {
+        "@types/bip39": "^2.4.0",
         "@types/chokidar": "^1.7.5",
         "@types/deep-equal": "^1.0.1",
         "@types/fs-extra": "^5.0.4",
@@ -28,6 +29,7 @@
         "@types/lodash.debounce": "^4.0.4",
         "@types/node": "^8.10.27",
         "app-data-folder": "^1.0.0",
+        "bip39": "^2.5.0",
         "chokidar": "^2.0.4",
         "deep-equal": "^1.0.1",
         "fs-extra": "^7.0.0",

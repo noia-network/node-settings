@@ -3,9 +3,9 @@ import { Validate } from "../../validator";
 
 export interface WebRtcSettingsDto {
     isEnabled: boolean;
-    controlIp: string | null;
+    controlIp: string;
     controlPort: number;
-    dataIp: string | null;
+    dataIp: string;
     dataPort: number;
 }
 
@@ -13,10 +13,10 @@ export class WebRtcSettings extends SettingsScopeBase<WebRtcSettingsDto> {
     public getDefaultSettings(): ScopeSettings<WebRtcSettingsDto> {
         return {
             isEnabled: false,
-            controlIp: "",
-            controlPort: 0,
-            dataIp: "",
-            dataPort: 0
+            controlIp: "0.0.0.0",
+            controlPort: 8048,
+            dataIp: "0.0.0.0",
+            dataPort: 8058
         };
     }
 
@@ -25,12 +25,14 @@ export class WebRtcSettings extends SettingsScopeBase<WebRtcSettingsDto> {
     }
 
     public validate(settings: ScopeSettings<WebRtcSettingsDto>): ScopeSettings<WebRtcSettingsDto> {
+        const defaultValue = this.getDefaultSettings();
+
         return {
             isEnabled: Validate(settings.isEnabled).isBoolean(),
-            controlIp: Validate(settings.controlIp, null).isString(false),
-            controlPort: Validate(settings.controlPort).isNetworkPort(),
-            dataIp: Validate(settings.dataIp, null).isString(false),
-            dataPort: Validate(settings.dataPort).isNetworkPort()
+            controlIp: Validate(settings.controlIp, defaultValue.controlIp).isIpv4(),
+            controlPort: Validate(settings.controlPort, defaultValue.controlPort).isNetworkPort(),
+            dataIp: Validate(settings.dataIp, defaultValue.dataIp).isIpv4(),
+            dataPort: Validate(settings.dataPort, defaultValue.dataPort).isNetworkPort()
         };
     }
 }
