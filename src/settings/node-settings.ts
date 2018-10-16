@@ -58,7 +58,7 @@ export interface NodeSettingsDto extends SettingsBaseDto {
 }
 
 export class NodeSettings extends SettingsBase<NodeSettingsDto> {
-    constructor(settings: DeepPartial<NodeSettingsDto>, filePath: string) {
+    constructor(settings: DeepPartial<NodeSettingsDto>, filePath: string = NodeSettings.getDefaultSettingsPath()) {
         super("node", settings, filePath);
     }
 
@@ -66,7 +66,7 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
      * Correctly initialize settings with hydration.
      * @param filePath Location of settings file.
      */
-    public static async init(filePath: string): Promise<NodeSettings> {
+    public static async init(filePath: string = NodeSettings.getDefaultSettingsPath()): Promise<NodeSettings> {
         const instance = new NodeSettings({}, filePath);
         const fileSettings = await instance.readSettings();
         instance.hydrate(fileSettings);
@@ -78,6 +78,10 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
         }
 
         return instance;
+    }
+
+    public static getDefaultSettingsPath(): string {
+        return path.resolve(AppDataFolder("noia-node"), "node.settings");
     }
 
     private readonly version: string = "1.0.0";
