@@ -58,7 +58,7 @@ export interface NodeSettingsDto extends SettingsBaseDto {
 }
 
 export class NodeSettings extends SettingsBase<NodeSettingsDto> {
-    constructor(settings: DeepPartial<NodeSettingsDto>, filePath: string = NodeSettings.getDefaultSettingsPath()) {
+    private constructor(settings: DeepPartial<NodeSettingsDto>, filePath: string = NodeSettings.getDefaultSettingsPath()) {
         super("node", settings, filePath);
     }
 
@@ -66,10 +66,16 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
      * Correctly initialize settings with hydration.
      * @param filePath Location of settings file.
      */
-    public static async init(filePath: string = NodeSettings.getDefaultSettingsPath()): Promise<NodeSettings> {
+    public static async init(
+        filePath: string = NodeSettings.getDefaultSettingsPath(),
+        settings?: DeepPartial<NodeSettingsDto>
+    ): Promise<NodeSettings> {
         const instance = new NodeSettings({}, filePath);
         const fileSettings = await instance.readSettings();
         instance.hydrate(fileSettings);
+        if (settings != null) {
+            instance.hydrate(settings);
+        }
 
         const latestSettings = instance.dehydrate();
 

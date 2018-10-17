@@ -100,8 +100,7 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
         return this.scopes;
     }
 
-    // TODO: Prevent additional data loss.
-    public hydrate(nextSettings: Partial<TSettings> = {}): void {
+    public hydrate(nextSettings: DeepPartial<TSettings> = {}): void {
         const settings = this.calculateSettings(nextSettings) as { [key: string]: unknown };
 
         for (const key of Object.keys(nextSettings)) {
