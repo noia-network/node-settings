@@ -21,7 +21,7 @@ export abstract class SettingsBase<TSettings extends SettingsBaseDto> extends Se
     private settingsWatcher: chokidar.FSWatcher;
     private isReadingFile: boolean = false;
 
-    public abstract async readSettings(): Promise<Partial<TSettings>>;
+    public abstract async readSettings(): Promise<DeepPartial<TSettings>>;
     protected abstract async writeSettingsHandler(settings: TSettings): Promise<void>;
 
     public async writeSettings(settings: TSettings): Promise<void> {
