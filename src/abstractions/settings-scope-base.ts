@@ -168,7 +168,7 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
 
             if (!Helpers.isPrimitiveOrArrayOfPrimitives(value)) {
                 if (this.scopes[key] != null) {
-                    this.scopes[key].hydrate(value as {});
+                    this.scopes[key].deepUpdate(value as {});
                 }
             }
         }
