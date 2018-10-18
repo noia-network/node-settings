@@ -9,12 +9,13 @@ import {
     PrimitiveAndPrimitiveArrayProperties,
     Primitive
 } from "../contracts/types-helpers";
-import { UpdatedEvent, HydratedEvent, Identifier } from "../contracts/settings-events";
+import { UpdatedEvent, HydratedEvent, Identifier, DeepUpdatedEvent } from "../contracts/settings-events";
 import { Helpers } from "../helpers";
 import { IdentifierHelpers } from "../identifier-helpers";
 
 interface SettingsScopeEvents {
     updated: (event: UpdatedEvent) => void;
+    deepUpdated: (event: DeepUpdatedEvent) => void;
     hydrated: (event: HydratedEvent) => void;
     error: Error;
 }
@@ -71,9 +72,9 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
     protected settings: TSettings;
     protected scopes: ScopesListSettings<TSettings>;
 
-    protected calculateSettings(settings: DeepPartial<TSettings>): TSettings {
+    protected calculateSettings(settings: DeepPartial<TSettings>, prevSettings = this.getDefaultSettings()): TSettings {
         const wholeSettings = {
-            ...(this.getDefaultSettings() as {}),
+            ...(prevSettings as {}),
             ...(settings as {})
         } as TSettings;
 
@@ -159,6 +160,26 @@ export abstract class SettingsScopeBase<TSettings extends {}> extends SettingsSc
         this.emit("updated", event);
     }
 
+    public deepUpdate(nextSettings: DeepPartial<TSettings> = {}): void {
+        const settings = this.calculateSettings(nextSettings, this.dehydrate()) as { [key: string]: unknown };
+
+        for (const key of Object.keys(nextSettings)) {
+            const value: unknown = settings[key];
+
+            if (!Helpers.isPrimitiveOrArrayOfPrimitives(value)) {
+                if (this.scopes[key] != null) {
+                    this.scopes[key].hydrate(value as {});
+                }
+            }
+        }
+
+        this.settings = settings as TSettings;
+
+        const event: DeepUpdatedEvent = {
+            scope: this.scope
+        };
+        this.emit("deepUpdated", event);
+    }
     /**
      * Resets to default value.
      */

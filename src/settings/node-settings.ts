@@ -21,7 +21,6 @@ import { BlockchainSettings, BlockchainSettingsDto } from "./blockchain-settings
 import { SslSettings, SslSettingsDto } from "./ssl-settings";
 
 export interface NodeSettingsDto extends SettingsBaseDto {
-    statisticsPath: string | null;
     /**
      * Domain SSL is valid for.
      */
@@ -59,7 +58,7 @@ export interface NodeSettingsDto extends SettingsBaseDto {
 
 export class NodeSettings extends SettingsBase<NodeSettingsDto> {
     private constructor(settings: DeepPartial<NodeSettingsDto>, filePath: string = NodeSettings.getDefaultSettingsPath()) {
-        super("node", settings, filePath);
+        super(NodeSettings.scopeKey, settings, filePath);
     }
 
     /**
@@ -70,16 +69,16 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
         filePath: string = NodeSettings.getDefaultSettingsPath(),
         settings?: DeepPartial<NodeSettingsDto>
     ): Promise<NodeSettings> {
-        const instance = new NodeSettings({}, filePath);
-        const fileSettings = await instance.readSettings();
-        instance.hydrate(fileSettings);
+        const fileSettings = await this.readFile(filePath);
+        const instance = new NodeSettings(fileSettings, filePath);
+
+        const prevSettings = instance.dehydrate();
         if (settings != null) {
-            instance.hydrate(settings);
+            instance.deepUpdate(settings);
         }
 
         const latestSettings = instance.dehydrate();
-
-        if (!Helpers.compareObjects(latestSettings, fileSettings)) {
+        if (!Helpers.compareObjects(latestSettings, prevSettings)) {
             instance.writeSettings(latestSettings);
         }
 
@@ -90,16 +89,44 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
         return path.resolve(AppDataFolder("noia-node"), "node.settings");
     }
 
+    protected static readonly scopeKey: string = "node";
+
+    protected static async writeFile(filePath: string, settings: NodeSettingsDto): Promise<void> {
+        const iniData: string = ini.encode({ [NodeSettings.scopeKey]: settings }, {
+            whitespace: true
+            // tslint:disable-next-line:no-any
+        } as any);
+
+        const header: string = "# NOIA Node settings file." + os.EOL;
+
+        await fs.writeFile(filePath, header + iniData);
+    }
+
+    protected static async readFile(filePath: string): Promise<Partial<NodeSettingsDto>> {
+        await fs.ensureFile(filePath);
+        const fileContents = await fs.readFile(filePath, { encoding: "utf8" });
+
+        let data: Partial<NodeSettingsDto>;
+        if (fileContents == null || fileContents === "") {
+            data = {};
+        } else {
+            const resolvedData = ini.parse(fileContents);
+            const scopedData = resolvedData[NodeSettings.scopeKey];
+
+            data = typeof scopedData === "object" ? scopedData : {};
+        }
+
+        return data;
+    }
+
     private readonly version: string = "1.0.0";
 
     public getDefaultSettings(): ScopeSettings<NodeSettingsDto> {
         const userDataPath: string = AppDataFolder("noia-node");
-        const statisticsPath: string = path.resolve(userDataPath, "statistics.json");
 
         return {
             version: this.version,
             userDataPath: userDataPath,
-            statisticsPath: statisticsPath,
             domain: null,
             masterAddress: null,
             nodeId: "",
@@ -113,7 +140,6 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
 
         return {
             version: Validate(settings.version, this.version).isString(false),
-            statisticsPath: Validate(settings.statisticsPath, defaultSettings.statisticsPath).isString(false),
             domain: Validate(settings.domain, null).isString(false),
             masterAddress: Validate(settings.masterAddress, null).isString(false),
             nodeId: Validate(settings.nodeId, () => Helpers.randomString(40)).isString(false),
@@ -135,30 +161,10 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
     }
 
     public async readSettings(): Promise<Partial<NodeSettingsDto>> {
-        await fs.ensureFile(this.filePath);
-        const fileContents = await fs.readFile(this.filePath, { encoding: "utf8" });
-
-        let data: Partial<NodeSettingsDto>;
-        if (fileContents == null || fileContents === "") {
-            data = {};
-        } else {
-            const resolvedData = ini.parse(fileContents);
-            const scopedData = resolvedData[this.scope.key];
-
-            data = typeof scopedData === "object" ? scopedData : {};
-        }
-
-        return data;
+        return NodeSettings.readFile(this.filePath);
     }
 
     protected async writeSettingsHandler(settings: NodeSettingsDto): Promise<void> {
-        const iniData: string = ini.encode({ [this.scope.key]: settings }, {
-            whitespace: true
-            // tslint:disable-next-line:no-any
-        } as any);
-
-        const header: string = "# NOIA Node settings file." + os.EOL;
-
-        await fs.writeFile(this.filePath, header + iniData);
+        NodeSettings.writeFile(this.filePath, settings);
     }
 }

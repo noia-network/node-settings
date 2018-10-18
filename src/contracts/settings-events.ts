@@ -15,3 +15,7 @@ export interface UpdatedEvent {
 export interface HydratedEvent {
     scope: Identifier;
 }
+
+export interface DeepUpdatedEvent {
+    scope: Identifier;
+}
