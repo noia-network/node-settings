@@ -13,19 +13,19 @@ import { UpdatedEvent, HydratedEvent, Identifier, DeepUpdatedEvent } from "../co
 import { Helpers } from "../helpers";
 import { IdentifierHelpers } from "../identifier-helpers";
 
-interface SettingsScopeEvents {
-    updated: (event: UpdatedEvent) => void;
-    deepUpdated: (event: DeepUpdatedEvent) => void;
-    hydrated: (event: HydratedEvent) => void;
-    error: Error;
-}
-
 export type ScopesListSettings<TValue> = {
     [TKey in keyof ExcludePrimitiveAndPrimitiveArrayProperties<TValue>]: SettingsScopeBase<
         ExcludePrimitiveAndPrimitiveArrayProperties<TValue>[TKey]
     >
 };
 export type ScopeSettings<TSettings> = PrimitiveAndPrimitiveArrayProperties<TSettings>;
+
+interface SettingsScopeEvents {
+    updated: (event: UpdatedEvent) => void;
+    deepUpdated: (event: DeepUpdatedEvent) => void;
+    hydrated: (event: HydratedEvent) => void;
+    error: Error;
+}
 
 const SettingsScopeEmitter: { new (): StrictEventEmitter<EventEmitter, SettingsScopeEvents> } = EventEmitter;
 

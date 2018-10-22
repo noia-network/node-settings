@@ -1,9 +1,9 @@
-import * as chokidar from "chokidar";
-// tslint:disable-next-line:no-require-imports
-import debounce = require("lodash.debounce");
-
+import * as os from "os";
 import { SettingsScopeBase } from "./settings-scope-base";
 import { DeepPartial } from "../contracts/types-helpers";
+import { Serializer } from "../contracts/serializer";
+import { FileHandler } from "../file-handler";
+import { UpdatedEvent } from "../contracts/settings-events";
 import { Helpers } from "../helpers";
 
 export interface SettingsBaseDto {
@@ -11,48 +11,53 @@ export interface SettingsBaseDto {
 }
 
 export abstract class SettingsBase<TSettings extends SettingsBaseDto> extends SettingsScopeBase<TSettings> {
-    constructor(scope: string, settings: DeepPartial<TSettings>, public readonly filePath: string) {
-        super(scope, settings);
+    constructor(
+        scopeKey: string,
+        settings: DeepPartial<TSettings>,
+        public readonly filePath: string,
+        protected readonly serializer: Serializer<TSettings>
+    ) {
+        super(scopeKey, settings);
 
-        this.on("updated", this.onUpdated.bind(this));
-        this.settingsWatcher = chokidar.watch(filePath).on("change", this.onFileChange.bind(this));
+        this.on("updated", this.onSettingsUpdate.bind(this));
+
+        this.fileHandler = new FileHandler(filePath);
+        this.fileHandler.on("change", this.onFileChange.bind(this));
     }
 
-    private settingsWatcher: chokidar.FSWatcher;
-    private isReadingFile: boolean = false;
+    protected readonly fileHandler: FileHandler;
 
-    public abstract async readSettings(): Promise<DeepPartial<TSettings>>;
-    protected abstract async writeSettingsHandler(settings: TSettings): Promise<void>;
-
-    public async writeSettings(settings: TSettings): Promise<void> {
-        // We don't listen to file changes while updating file.
-        this.settingsWatcher.removeAllListeners();
-        await this.writeSettingsHandler(settings);
-        this.settingsWatcher.on("change", this.onFileChange);
+    protected async readFile(): Promise<DeepPartial<TSettings>> {
+        const content = await this.fileHandler.read();
+        // Problems with TSettings and DeepPartial<TSettings>.
+        // tslint:disable-next-line:no-any
+        return (this.serializer.serialize(content) as any) as DeepPartial<TSettings>;
     }
 
-    private async onUpdated(): Promise<void> {
-        const nextSettingsState = this.dehydrate();
-        await this.writeSettings(nextSettingsState);
+    protected async writeFile(settings: TSettings): Promise<void> {
+        const settingsString = this.serializer.deserialize(settings);
+        const header: string = "# NOIA Node settings file." + os.EOL;
+        this.fileHandler.write(header + settingsString);
     }
 
-    private onFileChange: () => void = debounce(async () => {
-        if (this.isReadingFile) {
-            return;
-        }
+    protected onSettingsUpdate(_: UpdatedEvent): void {
+        const settings = this.dehydrate();
+        this.writeFile(settings);
+    }
 
+    protected async onFileChange(content: string): Promise<void> {
         try {
-            this.isReadingFile = true;
-            const data = await this.readSettings();
-            this.isReadingFile = false;
-            this.hydrate(data);
+            const data = this.serializer.serialize(content);
+            // Problems with TSettings and DeepPartial<TSettings>.
+            // tslint:disable-next-line:no-any
+            this.hydrate((data as any) as DeepPartial<TSettings>);
 
             const updatedSettings = this.dehydrate();
             if (!Helpers.compareObjects(updatedSettings, data)) {
-                this.writeSettings(updatedSettings);
+                await this.writeFile(updatedSettings);
             }
         } catch (error) {
             console.error("Tried reading file. Failed to resolve format.");
         }
-    }, 100);
+    }
 }

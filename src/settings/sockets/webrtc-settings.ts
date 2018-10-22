@@ -12,7 +12,7 @@ export interface WebRtcSettingsDto {
 export class WebRtcSettings extends SettingsScopeBase<WebRtcSettingsDto> {
     public getDefaultSettings(): ScopeSettings<WebRtcSettingsDto> {
         return {
-            isEnabled: false,
+            isEnabled: true,
             controlIp: "0.0.0.0",
             controlPort: 8048,
             dataIp: "0.0.0.0",
