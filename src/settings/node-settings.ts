@@ -84,7 +84,7 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
     }
 
     protected static readonly scopeKey: string = "node";
-    private readonly version: string = "1.0.0";
+    public static readonly version: string = "1.0.0";
 
     public static getDefaultSettingsPath(): string {
         return path.resolve(AppDataFolder("noia-node"), "node.settings");
@@ -94,7 +94,7 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
         const userDataPath: string = AppDataFolder("noia-node");
 
         return {
-            version: this.version,
+            version: NodeSettings.version,
             userDataPath: userDataPath,
             domain: null,
             masterAddress: null,
@@ -108,7 +108,7 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
         const defaultSettings = this.getDefaultSettings();
 
         return {
-            version: Validate(settings.version, this.version).isString(false),
+            version: Validate(settings.version, NodeSettings.version).isString(false),
             domain: Validate(settings.domain, null).isString(false),
             masterAddress: Validate(settings.masterAddress, null).isString(false),
             nodeId: Validate(settings.nodeId, () => Helpers.randomString(40)).isString(false),

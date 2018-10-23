@@ -18,5 +18,5 @@ export type PrimitiveAndPrimitiveArrayProperties<TType> = PropertiesExtend<TType
 export type ExcludePrimitiveAndPrimitiveArrayKeys<TType> = ExcludeKeysExtend<TType, Primitive | Primitive[]>;
 export type ExcludePrimitiveAndPrimitiveArrayProperties<TType> = ExcludePropertiesExtend<TType, Primitive | Primitive[]>;
 
-export declare type DeepPartial<TType> = { [TKey in keyof TType]?: DeepPartial<TType[TKey]> };
+export type DeepPartial<TType> = { [TKey in keyof TType]?: DeepPartial<TType[TKey]> };
 export type ExceptUndefined<TType> = TType extends undefined ? never : TType;

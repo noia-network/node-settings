@@ -9,3 +9,6 @@ export * from "./validator";
 // Latest settings
 export * from "./settings/node-settings";
 export * from "./contracts/settings-events";
+
+// Serializers
+export * from "./serializers/ini-serializer";
