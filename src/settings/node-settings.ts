@@ -1,12 +1,9 @@
-import * as path from "path";
-// tslint:disable-next-line:no-require-imports
-const AppDataFolder = require("app-data-folder");
-
 import { SettingsBase, SettingsBaseDto } from "../abstractions/settings-base";
 import { DeepPartial } from "../contracts/types-helpers";
 import { ScopeSettings, ScopesListSettings } from "../abstractions/settings-scope-base";
 import { Validate } from "../validator";
 import { Helpers } from "../helpers";
+import { DEFAULT_USER_DATA_PATH, DEFAULT_SETTINGS_PATH } from "./constants";
 
 //#region Scopes
 import { ControllerSettings, ControllerSettingsDto } from "./controller-settings";
@@ -68,15 +65,15 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
     ): Promise<NodeSettings> {
         const instance = new NodeSettings(filePath);
         const data = await instance.readFile();
+        const isEmptyFile = data == null;
         instance.hydrate(data);
 
-        const prevSettings = instance.dehydrate();
         if (settings != null) {
             instance.deepUpdate(settings);
         }
 
         const latestSettings = instance.dehydrate();
-        if (!Helpers.compareObjects(latestSettings, prevSettings)) {
+        if (isEmptyFile || !Helpers.compareObjects(latestSettings, data)) {
             await instance.writeFile(latestSettings);
         }
 
@@ -87,15 +84,13 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
     public static readonly version: string = "1.0.0";
 
     public static getDefaultSettingsPath(): string {
-        return path.resolve(AppDataFolder("noia-node"), "node.settings");
+        return DEFAULT_SETTINGS_PATH;
     }
 
     public getDefaultSettings(): ScopeSettings<NodeSettingsDto> {
-        const userDataPath: string = AppDataFolder("noia-node");
-
         return {
             version: NodeSettings.version,
-            userDataPath: userDataPath,
+            userDataPath: DEFAULT_USER_DATA_PATH,
             domain: null,
             masterAddress: null,
             nodeId: "",
