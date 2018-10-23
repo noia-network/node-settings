@@ -23,14 +23,14 @@ export interface BlockchainSettingsDto {
 export class BlockchainSettings extends SettingsScopeBase<BlockchainSettingsDto> {
     public getDefaultSettings(): ScopeSettings<BlockchainSettingsDto> {
         return {
-            isEnabled: true,
+            isEnabled: false,
             doCreateClient: false,
-            clientAddress: "",
-            airdropAddress: "",
+            clientAddress: null,
+            airdropAddress: null,
             walletMnemonic: "",
-            lastBlockPosition: "",
-            walletProviderUrl: "",
-            workOrderAddress: ""
+            lastBlockPosition: null,
+            walletProviderUrl: null,
+            workOrderAddress: null
         };
     }
 

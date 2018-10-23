@@ -27,8 +27,12 @@ export abstract class SettingsBase<TSettings extends SettingsBaseDto> extends Se
 
     protected readonly fileHandler: FileHandler;
 
-    protected async readFile(): Promise<DeepPartial<TSettings>> {
+    protected async readFile(): Promise<DeepPartial<TSettings> | undefined> {
         const content = await this.fileHandler.read();
+        if (content.trim().length === 0) {
+            return undefined;
+        }
+
         // Problems with TSettings and DeepPartial<TSettings>.
         // tslint:disable-next-line:no-any
         return (this.serializer.serialize(content) as any) as DeepPartial<TSettings>;
