@@ -20,6 +20,8 @@ export abstract class SettingsBase<TSettings extends SettingsBaseDto> extends Se
         super(scopeKey, settings);
 
         this.on("updated", this.onSettingsUpdate.bind(this));
+        this.on("deepUpdated", this.onSettingsUpdate.bind(this));
+        this.on("hydrated", this.onSettingsUpdate.bind(this));
 
         this.fileHandler = new FileHandler(filePath);
         this.fileHandler.on("change", this.onFileChange.bind(this));
