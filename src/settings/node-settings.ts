@@ -4,6 +4,7 @@ import { ScopeSettings, ScopesListSettings } from "../abstractions/settings-scop
 import { Validate } from "../validator";
 import { Helpers } from "../helpers";
 import { DEFAULT_USER_DATA_PATH, DEFAULT_SETTINGS_PATH } from "./constants";
+import { createIniSerializer } from "../serializers/ini-serializer";
 
 //#region Scopes
 import { ControllerSettings, ControllerSettingsDto } from "./controller-settings";
@@ -12,7 +13,7 @@ import { WhitelistSettings, WhitelistSettingsDto } from "./whitelist-settings";
 import { SocketsSettings, SocketsSettingsDto } from "./sockets-settings";
 import { BlockchainSettings, BlockchainSettingsDto } from "./blockchain-settings";
 import { SslSettings, SslSettingsDto } from "./ssl-settings";
-import { createIniSerializer } from "../serializers/ini-serializer";
+import { GuiSettings, GuiSettingsDto } from "./gui-settings";
 //#endregion
 
 export interface NodeSettingsDto extends SettingsBaseDto {
@@ -40,6 +41,7 @@ export interface NodeSettingsDto extends SettingsBaseDto {
      * Path to user user data folder. If specified, default settings.json and/or statistics.json will be saved to user data folder.
      */
     userDataPath: string;
+    autoReconnect: boolean;
 
     // SCOPES
     controller: ControllerSettingsDto;
@@ -48,6 +50,7 @@ export interface NodeSettingsDto extends SettingsBaseDto {
     whitelist: WhitelistSettingsDto;
     sockets: SocketsSettingsDto;
     ssl: SslSettingsDto;
+    gui: GuiSettingsDto;
 }
 
 export class NodeSettings extends SettingsBase<NodeSettingsDto> {
@@ -95,7 +98,8 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
             masterAddress: null,
             nodeId: "",
             natPmp: false,
-            publicIp: null
+            publicIp: null,
+            autoReconnect: false
         };
     }
 
@@ -109,7 +113,8 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
             nodeId: Validate(settings.nodeId, () => Helpers.randomString(40)).isString(false),
             natPmp: Validate(settings.natPmp).isBoolean(),
             publicIp: Validate(settings.masterAddress, null).isString(false),
-            userDataPath: Validate(settings.userDataPath, defaultSettings.userDataPath).isString(false)
+            userDataPath: Validate(settings.userDataPath, defaultSettings.userDataPath).isString(false),
+            autoReconnect: Validate(settings.autoReconnect, defaultSettings.autoReconnect).isBoolean()
         };
     }
 
@@ -120,7 +125,8 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
             storage: new StorageSettings("storage", this.settings.storage),
             whitelist: new WhitelistSettings("whitelist", this.settings.whitelist),
             sockets: new SocketsSettings("sockets", this.settings.sockets),
-            ssl: new SslSettings("ssl", this.settings.ssl)
+            ssl: new SslSettings("ssl", this.settings.ssl),
+            gui: new GuiSettings("gui", this.settings.gui)
         };
     }
 }
