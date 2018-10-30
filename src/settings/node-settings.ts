@@ -34,10 +34,6 @@ export interface NodeSettingsDto extends SettingsBaseDto {
      */
     nodeId: string;
     /**
-     * Public IP that master must use. If empty, master must resolve IP by itself.
-     */
-    publicIp: string | null;
-    /**
      * Path to user user data folder. If specified, default settings.json and/or statistics.json will be saved to user data folder.
      */
     userDataPath: string;
@@ -98,8 +94,7 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
             masterAddress: null,
             nodeId: "",
             natPmp: false,
-            publicIp: null,
-            autoReconnect: false
+            autoReconnect: true
         };
     }
 
@@ -112,7 +107,6 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
             masterAddress: Validate(settings.masterAddress, null).isString(false),
             nodeId: Validate(settings.nodeId, () => Helpers.randomString(40)).isString(false),
             natPmp: Validate(settings.natPmp).isBoolean(),
-            publicIp: Validate(settings.masterAddress, null).isString(false),
             userDataPath: Validate(settings.userDataPath, defaultSettings.userDataPath).isString(false),
             autoReconnect: Validate(settings.autoReconnect, defaultSettings.autoReconnect).isBoolean()
         };
