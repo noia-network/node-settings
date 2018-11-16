@@ -91,7 +91,7 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
             version: NodeSettings.version,
             userDataPath: DEFAULT_USER_DATA_PATH,
             domain: null,
-            masterAddress: null,
+            masterAddress: "wss://csl-masters.noia.network:5565",
             nodeId: "",
             natPmp: false,
             autoReconnect: true
