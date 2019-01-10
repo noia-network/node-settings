@@ -93,7 +93,7 @@ export class NodeSettings extends SettingsBase<NodeSettingsDto> {
             domain: null,
             masterAddress: "wss://csl-masters.noia.network:5565",
             nodeId: "",
-            natPmp: false,
+            natPmp: true,
             autoReconnect: true
         };
     }

@@ -11,7 +11,7 @@ export class StorageSettings extends SettingsScopeBase<StorageSettingsDto> {
     public getDefaultSettings(): ScopeSettings<StorageSettingsDto> {
         return {
             dir: DEFAULT_STORAGE_PATH,
-            size: 0
+            size: 100 * 1024 * 1024
         };
     }
 
